@@ -12,6 +12,8 @@
 
 <p>Your nearest U1 bus stop is: <span id="nearest">...</span></p>
 
+<p><button onclick="geoPosition.getCurrentPosition(success_callback,error_callback,{enableHighAccuracy:true});">Update</button></p>
+
 <script type="text/javascript">
     var locElmt = document.getElementById("loc");
     var nearestElmt = document.getElementById("nearest");
