@@ -35,7 +35,7 @@
             lon: coords.longitude
         })
           .done(function(data){
-            nearestElmt.innerHTML = data.name + ", " +
+            nearestElmt.innerHTML = data.name + ", ~" +
                 Math.round(data.distance) + "m away";
           });
     }
