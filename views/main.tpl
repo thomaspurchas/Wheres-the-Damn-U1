@@ -24,6 +24,9 @@
     .btn-default:focus {
         background-color: white;
     }
+    #loc, #nearest {
+        white-space: nowrap;
+    }
     </style>
 </head>
 <body>
