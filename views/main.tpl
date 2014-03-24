@@ -5,6 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
     <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
     <script src="/static/geoPosition.js" type="text/javascript" charset="utf-8"></script>
+
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+    <style>
+    body {
+        padding: 5px;
+    }
+    </style>
 </head>
 <body>
 
@@ -13,7 +21,9 @@
 <p>Your nearest U1 bus stop is: <span id="nearest">...</span></p>
 
 <p>
-    <button onclick="geoPosition.getCurrentPosition(success_callback,error_callback,{enableHighAccuracy:true});">
+    <button type="button" class="btn btn-default"
+    onclick="geoPosition.getCurrentPosition(success_callback,error_callback,{enableHighAccuracy:true});">
+        <i class="fa fa-compass"></i>
         Update Location
     </button>
 </p>
