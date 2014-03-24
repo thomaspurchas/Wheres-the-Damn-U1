@@ -134,6 +134,6 @@ def latlon_json(geoStr):
     return {'lon': cords[0], 'lat': cords[1]}
 
 if HEROKU:
-    run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
+    run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)), server='gunicorn', workers=4)
 else:
     run(host='0.0.0.0', port=8080, debug=True, reloader=True)

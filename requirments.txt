@@ -2,6 +2,7 @@ GeoAlchemy2==0.2.3
 SQLAlchemy==0.9.3
 bottle==0.12.5
 bottle-sqlalchemy==0.4.1
+gunicorn==18.0
 psycopg2==2.5.2
 pysqlite==2.6.3
 wsgiref==0.1.2
