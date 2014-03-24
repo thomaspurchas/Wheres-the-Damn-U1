@@ -52,12 +52,6 @@ class BusStop(Base):
     def __str__(self):
         return "BusStop('%s', '%s', '%s')" % (self.id, self.name, self.location)
 
-@route('/hello/<name>')
-def greet(name='Stranger'):
-    gets = dict(request.query.decode())
-
-    return template('Hello {{name}}, how are you? {{gets}}', name=name, gets=gets)
-
 @route('/addstop')
 def addstop(db):
     query = request.query.decode()
