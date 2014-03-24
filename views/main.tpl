@@ -19,7 +19,7 @@
         geoPosition.getCurrentPosition(success_callback,error_callback,{enableHighAccuracy:true});
     } else {
             // You cannot use Geolocation in this device
-        locElmt.innerHTML = "Damn, can't get you location. Sorry :(";
+        locElmt.innerHTML = "Damn, can't get your location. Sorry :(";
     }
 
     // p : geolocation object
@@ -42,7 +42,7 @@
 
     function error_callback(p){
         // p.message : error message
-        locElmt.innerHTML = "Damn, can't get you location. Sorry :(";
+        locElmt.innerHTML = "Damn, can't get your location. Sorry :(";
     }
 </script>
 
