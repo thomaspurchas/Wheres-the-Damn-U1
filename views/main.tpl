@@ -30,8 +30,7 @@
 <p>Your nearest U1 bus stop is: <span id="nearest">...</span></p>
 
 <p>
-    <button type="button" class="btn btn-default"
-    onclick="geoPosition.getCurrentPosition(success_callback,error_callback,{enableHighAccuracy:true});">
+    <button type="button" class="btn btn-default" id="updateButton">
         <i class="fa fa-compass"></i>
         Update Location
     </button>
@@ -51,7 +50,9 @@
     function success_callback(p) {
         // p.latitude : latitude value
         // p.longitude : longitude value
-        console.log(p);
+        // $('#updateButton').prop('disabled', false)
+        //     .find('.fa-compass').removeClass('fa-spin');
+
         coords = p.coords;
         locElmt.innerHTML = coords.latitude + ", " + coords.longitude;
 
@@ -69,6 +70,16 @@
         // p.message : error message
         locElmt.innerHTML = "Damn, can't get your location. Sorry :(";
     }
+
+    $('#updateButton').click(function(event){
+        geoPosition.getCurrentPosition(
+                                    success_callback,
+                                    error_callback,
+                                    {enableHighAccuracy:true}
+        );
+        this.disabled = true;
+        $(this).find('.fa-compass').addClass('fa-spin');
+    });
 </script>
 
 </body>
