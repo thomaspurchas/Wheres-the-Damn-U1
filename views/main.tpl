@@ -56,9 +56,8 @@
     function success_callback(p) {
         // p.latitude : latitude value
         // p.longitude : longitude value
-        var updateButton = $('#updateButton').prop('disabled', false);
-        updateButton.find('.fa-compass').removeClass('fa-spin');
-        updateButton.contents().last()[0].textContent=' Update Location';
+        var updateButton = $('#updateButton');
+        updateButton.contents().last()[0].textContent=' Getting Bus Stop';
 
         coords = p.coords;
         locElmt.innerHTML = coords.latitude + ", " + coords.longitude;
@@ -70,6 +69,10 @@
           .done(function(data){
             nearestElmt.innerHTML = data.name + ", ~" +
                 Math.round(data.distance) + "m away";
+
+            updateButton.prop('disabled', false);
+            updateButton.find('.fa-compass').removeClass('fa-spin');
+            updateButton.contents().last()[0].textContent=' Update Location';
           });
     }
 
