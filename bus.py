@@ -6,6 +6,8 @@ from sqlalchemy import create_engine, Column, Integer, Sequence, String
 from sqlalchemy.ext.declarative import declarative_base
 from geoalchemy2 import Geometry
 
+import bmemcache_plugin
+
 import json
 import os
 
@@ -13,6 +15,7 @@ import os
 HEROKU = True if os.environ.get("DATABASE_URL", None) else False
 DEBUG = HEROKU
 DATABASE_URL = os.environ.get("DATABASE_URL", 'postgresql://kjntea_omsysv:35deb151@spacialdb.com:9999/kjntea_omsysv')
+MEMCACHEDCLOUD_SERVERS = os.environ.get('MEMCACHEDCLOUD_SERVERS', 'localhost:11211').split(',')
 
 Base = declarative_base()
 engine = create_engine(DATABASE_URL, echo=DEBUG)
@@ -22,6 +25,14 @@ plugin = sqlalchemy.Plugin(
     Base.metadata, # SQLAlchemy metadata, required only if create=True.
     keyword='db', # Keyword used to inject session database in a route (default 'db').
     create=True, # If it is true, execute `metadata.create_all(engine)` when plugin is applied (default False).
+)
+
+install(plugin)
+
+plugin = bmemcache_plugin.Plugin(
+    MEMCACHEDCLOUD_SERVERS,
+    os.environ.get('MEMCACHEDCLOUD_USERNAME', None),
+    os.environ.get('MEMCACHEDCLOUD_PASSWORD', None)
 )
 
 install(plugin)
@@ -98,21 +109,24 @@ def getstops(db):
     return {"bus_stops": stops}
 
 @route('/nearest')
-def getnearestsop(db):
-    location = (request.query.decode()['lon'], request.query.decode()['lat'])
-    location = 'POINT(%s %s)' % location
+def getnearestsop(db, mc):
+    location = (float(request.query.decode()['lon']), float(request.query.decode()['lat']))
+    location = 'POINT({:.4f} {:.5f})'.format(*location)
 
-    query = db.query(BusStop.id,
-                     BusStop.name,
-                     BusStop.location.ST_AsGeoJSON().label('geo'),
-                     BusStop.location.ST_Distance_Sphere(location).label('distance')
-                     ).order_by('distance').first()
+    stop = mc.get("USERLOC:" + location)
+    if not stop:
+        stop = db.query(BusStop.id,
+                         BusStop.name,
+                         BusStop.location.ST_AsGeoJSON().label('geo'),
+                         BusStop.location.ST_Distance_Sphere(location).label('distance')
+                         ).order_by('distance').first()
 
+        mc.set("USERLOC:" + location, stop)
 
-    return {'id': query.id,
-            'name': query.name,
-            'distance': query.distance,
-            'location': latlon_json(query.geo)
+    return {'id': stop.id,
+            'name': stop.name,
+            'distance': stop.distance,
+            'location': latlon_json(stop.geo)
             }
 
 @route('/delete')
