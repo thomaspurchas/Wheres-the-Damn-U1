@@ -1,1 +1,1 @@
-web: python bus.py
+web: newrelic-admin run-program python bus.py
