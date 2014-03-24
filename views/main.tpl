@@ -18,6 +18,9 @@
     .btn:active:focus {
         outline: none;
     }
+    .btn:hover {
+        background-color: white;
+    }
     .btn-default:focus {
         background-color: white;
     }
