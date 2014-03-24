@@ -57,7 +57,8 @@ def addstop(db):
     stop = BusStop(name)
     stop.location = 'POINT(%s %s)' % (lon, lat)
 
-    db.add(stop)
+    if DEBUG:
+        db.add(stop)
 
     return "Stop: " + str(stop)
 
@@ -116,7 +117,8 @@ def getnearestsop(db):
 
 @route('/delete')
 def deleteallstops(db):
-    db.query(BusStop).delete()
+    if DEBUG:
+        db.query(BusStop).delete()
 
 @route('/')
 def show_home():
