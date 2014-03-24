@@ -30,9 +30,9 @@
 <p>Your nearest U1 bus stop is: <span id="nearest">...</span></p>
 
 <p>
-    <button type="button" class="btn btn-default" id="updateButton">
-        <i class="fa fa-compass"></i>
-        Update Location
+    <button type="button" class="btn btn-default" id="updateButton" disabled>
+        <i class="fa fa-compass fa-spin"></i>
+        Getting Location
     </button>
 </p>
 
@@ -50,8 +50,9 @@
     function success_callback(p) {
         // p.latitude : latitude value
         // p.longitude : longitude value
-        // $('#updateButton').prop('disabled', false)
-        //     .find('.fa-compass').removeClass('fa-spin');
+        var updateButton = $('#updateButton').prop('disabled', false);
+        updateButton.find('.fa-compass').removeClass('fa-spin');
+        updateButton.contents().last()[0].textContent=' Update Location';
 
         coords = p.coords;
         locElmt.innerHTML = coords.latitude + ", " + coords.longitude;
@@ -78,7 +79,8 @@
                                     {enableHighAccuracy:true}
         );
         this.disabled = true;
-        $(this).find('.fa-compass').addClass('fa-spin');
+        $(this).find('.fa-compass').addClass('fa-spin')
+        $(this).contents().last()[0].textContent=' Getting Location';
     });
 </script>
 
