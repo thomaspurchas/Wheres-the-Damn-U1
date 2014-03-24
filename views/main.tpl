@@ -12,6 +12,15 @@
     body {
         padding: 5px;
     }
+    .btn:focus {
+        outline: none;
+    }
+    .btn:active:focus {
+        outline: none;
+    }
+    .btn-default:focus {
+        background-color: white;
+    }
     </style>
 </head>
 <body>
@@ -39,7 +48,7 @@
     }
 
     // p : geolocation object
-    function success_callback(p){
+    function success_callback(p) {
         // p.latitude : latitude value
         // p.longitude : longitude value
         console.log(p);
