@@ -5,7 +5,7 @@ from bottle.ext import sqlalchemy
 from sqlalchemy import create_engine, Column, Integer, Sequence, String, Enum, ForeignKey, Date, Time
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.ext.declarative import declarative_base
-from geoalchemy2 import Geometry
+from geoalchemy2 import Geography
 
 import bmemcache_plugin
 
@@ -43,7 +43,7 @@ class BusStop(Base):
 
     id = Column(Integer, Sequence('busstops_id_seq'), primary_key=True)
     name = Column(String(50), nullable=False)
-    location = Column(Geometry('POINT'), nullable=False)
+    location = Column(Geography('POINT', srid=4326), nullable=False)
 
     def __init__(self, name):
         self.name = name
@@ -152,7 +152,7 @@ def getstops(db):
 
     if location:
         query = query.add_columns(
-                BusStop.location.ST_Distance_Sphere(location).label('distance')
+                BusStop.location.ST_Distance(location).label('distance')
                 ).order_by('distance')
 
     stops = []
@@ -180,7 +180,7 @@ def getnearestsop(db, mc):
         stop = db.query(BusStop.id,
                          BusStop.name,
                          BusStop.location.ST_AsGeoJSON().label('geo'),
-                         BusStop.location.ST_Distance_Sphere(location).label('distance')
+                         BusStop.location.ST_Distance(location).label('distance')
                          ).order_by('distance').first()
 
         mc.set("USERLOC:" + location, stop)
