@@ -82,14 +82,32 @@ class Timetable(Base):
 
     route = relationship("Route", backref=backref('timetables', order_by=id))
 
+    def to_JSON(self):
+        return {
+            'id': self.id,
+            'route': self.route.id,
+            'route_number': self.route.number,
+            'name': self.name,
+            'valid_from': self.valid_from,
+            'valid_to': self.valid_to
+        }
+
 class Route(Base):
     __tablename__ = "Routes"
 
     id = Column(Integer, Sequence('routes_id_seq'), primary_key=True)
     name = Column(String(100), nullable=False)
+    number = Column(String(5), nullable=False)
 
     def __str__(self):
-        return "Route('%s', '%s')" % (self.id, self.name)
+        return "Route('%s', '%s', '%s')" % (self.id, self.name, self.number)
+
+    def to_JSON(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'number': self.number
+        }
 
 @route('/addstop')
 def addstop(db):
@@ -131,14 +149,9 @@ def add_route(db):
 
 @route('/routes')
 def get_routes(db):
-    query = db.query(Route.id, Route.name)
+    query = db.query(Route)
 
-    routes = []
-    for route in query:
-        temp = {'id': route.id,
-                'name': route.name
-                }
-        routes.append(temp)
+    routes = [route.to_JSON() for route in query]
 
     return {'routes': routes}
 
