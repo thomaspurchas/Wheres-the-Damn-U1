@@ -14,6 +14,8 @@ import json_encoder
 import json
 import os
 
+DAYS = ['SUN', 'MON', 'TUE', 'WED', 'THUR', 'FRI', 'SAT']
+
 # Guess if we are running on Heroku at the moment
 HEROKU = True if os.environ.get("DATABASE_URL", None) else False
 DEBUG = not HEROKU
@@ -130,16 +132,38 @@ def add_timetable(db):
 
     name = query['name']
     route = query['route']
-    valid_from = ['valid_from']
-    valid_to = ['valid_to']
+    valid_from = query['valid_from']
+    valid_to = query['valid_to']
+
+    route = db.query(Route).filter_by(id=route).one()
+
+    t_table = Timetable(
+        name=name,
+        route=route,
+        valid_from=valid_from,
+        valid_to=valid_to
+    )
+
+    if DEBUG:
+        db.add(t_table)
+        db.flush()
+
+    return {'timetable': t_table.to_JSON()}
+
+@route('/timetables')
+def get_timetables(db):
+    t_tables = [t.to_JSON() for t in db.query(Timetable)]
+
+    return {"timetable": t_tables}
 
 @route('/addroute')
 def add_route(db):
     query = request.query.decode()
 
     name = query['name']
+    number = query['number']
 
-    route = Route(name=name)
+    route = Route(name=name, number=number)
 
     if DEBUG:
         db.add(route)
