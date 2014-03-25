@@ -2,7 +2,8 @@
 
 from bottle import route, request, run, template, install, static_file
 from bottle.ext import sqlalchemy
-from sqlalchemy import create_engine, Column, Integer, Sequence, String
+from sqlalchemy import create_engine, Column, Integer, Sequence, String, Enum, ForeignKey, Date, Time
+from sqlalchemy.dialects import postgresql
 from sqlalchemy.ext.declarative import declarative_base
 from geoalchemy2 import Geometry
 
@@ -13,7 +14,7 @@ import os
 
 # Guess if we are running on Heroku at the moment
 HEROKU = True if os.environ.get("DATABASE_URL", None) else False
-DEBUG = HEROKU
+DEBUG = not HEROKU
 DATABASE_URL = os.environ.get("DATABASE_URL", 'postgresql://kjntea_omsysv:35deb151@spacialdb.com:9999/kjntea_omsysv')
 MEMCACHEDCLOUD_SERVERS = os.environ.get('MEMCACHEDCLOUD_SERVERS', 'localhost:11211').split(',')
 
@@ -39,9 +40,10 @@ install(plugin)
 
 class BusStop(Base):
     __tablename__ = 'BusStops'
-    id = Column(Integer, Sequence('id_seq'), primary_key=True)
-    name = Column(String(50))
-    location = Column(Geometry('POINT'))
+
+    id = Column(Integer, Sequence('busstops_id_seq'), primary_key=True)
+    name = Column(String(50), nullable=False)
+    location = Column(Geometry('POINT'), nullable=False)
 
     def __init__(self, name):
         self.name = name
@@ -51,6 +53,36 @@ class BusStop(Base):
 
     def __str__(self):
         return "BusStop('%s', '%s', '%s')" % (self.id, self.name, self.location)
+
+
+class DepartureTime(Base):
+    __tablename__ = "Departures"
+
+    id = Column(Integer, Sequence('departures_id_seq'), primary_key=True)
+    timetable = Column(ForeignKey('Timetables.id'), nullable=False)
+    valid_days = Column(postgresql.ARRAY(String), nullable=False)
+    time = Column(Time(), nullable=False)
+    bus = Column(String(50), nullable=False)
+
+
+class Timetable(Base):
+    __tablename__ = "Timetables"
+
+    id = Column(Integer, Sequence('timetables_id_seq'), primary_key=True)
+    route = Column(ForeignKey('Routes.id'), nullable=False)
+    name = Column(String(100), nullable=False)
+    valid_from = Column(Date, nullable=False)
+    valid_to = Column(Date, nullable=False)
+
+
+class Route(Base):
+    __tablename__ = "Routes"
+
+    id = Column(Integer, Sequence('routes_id_seq'), primary_key=True)
+    name = Column(String(100), nullable=False)
+
+    def __str__(self):
+        return "Route('%s', '%s')" % (self.id, self.name)
 
 @route('/addstop')
 def addstop(db):
@@ -66,6 +98,42 @@ def addstop(db):
         db.add(stop)
 
     return "Stop: " + str(stop)
+
+@route('/addtimetable')
+def add_timetable(db):
+    query = request.query.decode()
+
+    name = query['name']
+    route = query['route']
+    valid_from = ['valid_from']
+    valid_to = ['valid_to']
+
+@route('/addroute')
+def add_route(db):
+    query = request.query.decode()
+
+    name = query['name']
+
+    route = Route(name=name)
+
+    if DEBUG:
+        db.add(route)
+        db.flush()
+
+    return "Route: %s" % route
+
+@route('/routes')
+def get_routes(db):
+    query = db.query(Route.id, Route.name)
+
+    routes = []
+    for route in query:
+        temp = {'id': route.id,
+                'name': route.name
+                }
+        routes.append(temp)
+
+    return {'routes': routes}
 
 @route('/stops')
 def getstops(db):
