@@ -8,6 +8,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from geoalchemy2 import Geography
 
 import bmemcache_plugin
+import json_encoder
 
 import json
 import os
@@ -37,6 +38,8 @@ plugin = bmemcache_plugin.Plugin(
 )
 
 install(plugin)
+
+install(json_encoder.Plugin)
 
 class BusStop(Base):
     __tablename__ = 'BusStops'
