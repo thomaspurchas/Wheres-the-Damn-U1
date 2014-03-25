@@ -3,6 +3,7 @@
 from bottle import route, request, run, template, install, static_file
 from bottle.ext import sqlalchemy
 from sqlalchemy import create_engine, Column, Integer, Sequence, String, Enum, ForeignKey, Date, Time
+from sqlalchemy.orm import relationship, backref
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.ext.declarative import declarative_base
 from geoalchemy2 import Geography
@@ -62,21 +63,24 @@ class DepartureTime(Base):
     __tablename__ = "Departures"
 
     id = Column(Integer, Sequence('departures_id_seq'), primary_key=True)
-    timetable = Column(ForeignKey('Timetables.id'), nullable=False)
+    timetable_id = Column(ForeignKey('Timetables.id'), nullable=False)
     valid_days = Column(postgresql.ARRAY(String), nullable=False)
     time = Column(Time(), nullable=False)
-    bus = Column(String(50), nullable=False)
+    destination = Column(String(50))
+
+    route = relationship("Timetable", backref=backref('departure_times', order_by=id))
 
 
 class Timetable(Base):
     __tablename__ = "Timetables"
 
     id = Column(Integer, Sequence('timetables_id_seq'), primary_key=True)
-    route = Column(ForeignKey('Routes.id'), nullable=False)
+    route_id = Column(ForeignKey('Routes.id'), nullable=False)
     name = Column(String(100), nullable=False)
     valid_from = Column(Date, nullable=False)
     valid_to = Column(Date, nullable=False)
 
+    route = relationship("Route", backref=backref('timetables', order_by=id))
 
 class Route(Base):
     __tablename__ = "Routes"
