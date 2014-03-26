@@ -50,6 +50,10 @@
 <pre id="errorMessage"></pre>
 </div>
 
+<div class="alert alert-warning" id="offlineError">
+    <strong>Offline!</strong> There doesn't appear to be an internet connection :(
+</div>
+
 <p>
     <button type="button" class="btn btn-default" id="updateButton" disabled>
         <i class="fa fa-compass fa-spin"></i>
@@ -125,9 +129,14 @@
                                     error_callback,
                                     {enableHighAccuracy:true}
         );
-        this.disabled = true;
-        $(this).find('.fa-compass').addClass('fa-spin')
-        $(this).contents().last()[0].textContent=' Getting Location';
+        if (navigator.onLine) {
+            $('#offlineError').hide();
+            this.disabled = true;
+            $(this).find('.fa-compass').addClass('fa-spin')
+            $(this).contents().last()[0].textContent=' Getting Location';
+        }else{
+            $('#offlineError').show();
+        }
     });
 </script>
 
