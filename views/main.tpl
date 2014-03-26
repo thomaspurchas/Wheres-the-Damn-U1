@@ -127,16 +127,16 @@
     }
 
     $('#updateButton').click(function(event){
-        geoPosition.getCurrentPosition(
-                                    success_callback,
-                                    error_callback,
-                                    {enableHighAccuracy:true}
-        );
         if (navigator.onLine) {
             $('#offlineError').hide();
             this.disabled = true;
             $(this).find('.fa-compass').addClass('fa-spin')
             $(this).contents().last()[0].textContent=' Getting Location';
+            geoPosition.getCurrentPosition(
+                                        success_callback,
+                                        error_callback,
+                                        {enableHighAccuracy:true}
+            );
         }else{
             $('#offlineError').show();
         }
