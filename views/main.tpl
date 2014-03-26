@@ -40,7 +40,7 @@
 </head>
 <body>
 
-<h1>Where the hell's the <span class="routeNumber">U1?</span></h1>
+<h1>Where the hell's the <span class="routeNumber">U1</span>?</h1>
 
 <p>Your location is: <span id="loc">...</span></p>
 
@@ -103,6 +103,7 @@
 
             if (data.next_bus != null){
                 busElmt.innerHTML = data.next_bus.time;
+                $('.routeNumber').text(data.next_bus.route_number);
             }else{
                 busElmt.innerHTML = "Sorry, that data is not avaliable at the moment :(";
             }
