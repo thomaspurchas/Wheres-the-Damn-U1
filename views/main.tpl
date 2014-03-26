@@ -30,17 +30,25 @@
     #lastUpdate {
         color: #b9b9b9;
     }
+    #updateError {
+        display: None;
+    }
     </style>
 </head>
 <body>
 
-<h1>Where the hell's the U1?</h1>
+<h1>Where the hell's the <span class="routeNumber">U1?</span></h1>
 
 <p>Your location is: <span id="loc">...</span></p>
 
-<p>Your nearest U1 bus stop is: <span id="nearest">...</span></p>
+<p>Your nearest <span class="routeNumber">U1</span> bus stop is: <span id="nearest">...</span></p>
 
 <p>and the next bus is: <span id="bus">...</span></p>
+
+<div class="alert alert-danger" id="updateError">
+<strong>Oh snap!</strong> We couldn't get the latest bus data :(
+<pre id="errorMessage"></pre>
+</div>
 
 <p>
     <button type="button" class="btn btn-default" id="updateButton" disabled>
@@ -67,22 +75,20 @@
         // p.latitude : latitude value
         // p.longitude : longitude value
         var updateButton = $('#updateButton');
-        updateButton.contents().last()[0].textContent=' Getting Bus Stop';
+        updateButton.contents().last()[0].textContent=' Getting Bus Info';
 
         coords = p.coords;
         locElmt.innerHTML = coords.latitude + ", " + coords.longitude;
 
         var currentdate = new Date();
         var update_datetime = "Last Update: "
-                + currentdate.getHours() + ":"
-                + currentdate.getMinutes() + ":"
-                + currentdate.getSeconds();
-
+            + currentdate.toLocaleTimeString();
         $.getJSON("/nearest", {
             lat: coords.latitude,
             lon: coords.longitude
         })
           .done(function(data){
+            $('#updateError').hide();
             lastUpdate.innerHTML = update_datetime;
 
             nearestElmt.innerHTML = data.stop.name + ", ~" +
@@ -97,6 +103,14 @@
             updateButton.prop('disabled', false);
             updateButton.find('.fa-compass').removeClass('fa-spin');
             updateButton.contents().last()[0].textContent=' Update Location';
+          })
+          .fail(function( jqxhr, textStatus, error ) {
+            updateButton.prop('disabled', false);
+            updateButton.find('.fa-compass').removeClass('fa-spin');
+            updateButton.contents().last()[0].textContent=' Update Location';
+            var err = textStatus + ", " + error;
+            $('#errorMessage').text(err);
+            $('#updateError').show();
           });
     }
 
