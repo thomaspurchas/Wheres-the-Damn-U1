@@ -35,6 +35,8 @@
 
 <p>Your nearest U1 bus stop is: <span id="nearest">...</span></p>
 
+<p>and the next bus is: <span id="bus">...</span></p>
+
 <p>
     <button type="button" class="btn btn-default" id="updateButton" disabled>
         <i class="fa fa-compass fa-spin"></i>
@@ -45,6 +47,7 @@
 <script type="text/javascript">
     var locElmt = document.getElementById("loc");
     var nearestElmt = document.getElementById("nearest");
+    var busElmt = document.getElementById("bus");
     if(geoPosition.init()){  // Geolocation Initialisation
         geoPosition.getCurrentPosition(success_callback,error_callback,{enableHighAccuracy:true});
     } else {
@@ -67,8 +70,14 @@
             lon: coords.longitude
         })
           .done(function(data){
-            nearestElmt.innerHTML = data.name + ", ~" +
-                Math.round(data.distance) + "m away";
+            nearestElmt.innerHTML = data.stop.name + ", ~" +
+                Math.round(data.stop.distance) + "m away";
+
+            if (data.next_bus != null){
+                busElmt.innerHTML = data.next_bus.time;
+            }else{
+                busElmt.innerHTML = "Sorry, that data is not avaliable at the moment :(";
+            }
 
             updateButton.prop('disabled', false);
             updateButton.find('.fa-compass').removeClass('fa-spin');
