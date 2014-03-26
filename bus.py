@@ -2,7 +2,7 @@
 
 from bottle import route, request, run, template, install, static_file
 from bottle.ext import sqlalchemy
-from sqlalchemy import create_engine, Column, Integer, Sequence, String, Enum, ForeignKey, Date, Time
+from sqlalchemy import create_engine, Column, Integer, Sequence, String, Enum, ForeignKey, Date, Time, UniqueConstraint
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.ext.declarative import declarative_base
@@ -13,6 +13,7 @@ import json_encoder
 
 import json
 import os
+import datetime
 
 DAYS = ['SUN', 'MON', 'TUE', 'WED', 'THUR', 'FRI', 'SAT']
 
@@ -66,11 +67,27 @@ class DepartureTime(Base):
 
     id = Column(Integer, Sequence('departures_id_seq'), primary_key=True)
     timetable_id = Column(ForeignKey('Timetables.id'), nullable=False)
+    bus_stop_id = Column(ForeignKey('BusStops.id'), nullable=False)
     valid_days = Column(postgresql.ARRAY(String), nullable=False)
     time = Column(Time(), nullable=False)
     destination = Column(String(50))
 
-    route = relationship("Timetable", backref=backref('departure_times', order_by=id))
+    timetable = relationship("Timetable", backref=backref('departure_times', order_by=id))
+    bus_stop = relationship("BusStop", backref=backref('departure_times', order_by=id))
+
+    __table_args__ = (
+        UniqueConstraint('timetable_id', 'time', 'destination', 'valid_days'),
+        )
+
+    def to_JSON(self):
+        return {
+            'id': self.id,
+            'timetable': self.timetable_id,
+            'route_number': self.timetable.route.number,
+            'destination': self.destination,
+            'time': self.time,
+            'valid_days': self.valid_days
+        }
 
 
 class Timetable(Base):
@@ -112,7 +129,7 @@ class Route(Base):
         }
 
 @route('/addstop')
-def addstop(db):
+def add_stop(db):
     query = request.query.decode()
     name = query['name']
     lat = float(query['lat'])
@@ -125,6 +142,42 @@ def addstop(db):
         db.add(stop)
 
     return "Stop: " + str(stop)
+
+@route('/adddeparture')
+def add_departure_time(db):
+    query = request.query.decode()
+    timetable = db.query(Timetable).filter_by(id=query['timetable']).one()
+    valid_days = query['days'].split(',')
+    time = query['time'] + " Europe/London"
+    destination = query.get('dest', None)
+    stop = db.query(BusStop).filter_by(id=query['stop']).one()
+
+    if valid_days == ['WEEK']:
+        valid_days = ['MON', 'TUE', 'WED', 'THUR', 'FRI']
+    elif valid_days == ['END']:
+        valid_days = ['SAT', 'SUN']
+    else:
+        valid_days = [day.upper().strip() for day in valid_days if day.upper().strip() in DAYS]
+
+    dt = DepartureTime(
+        timetable=timetable,
+        valid_days=valid_days,
+        time=time,
+        destination=destination,
+        bus_stop=stop
+    )
+
+    if DEBUG:
+        db.add(dt)
+        db.flush()
+
+    return {'departure_time': dt.to_JSON()}
+
+@route('/departures')
+def get_departures(db):
+    departures = [d.to_JSON() for d in db.query(DepartureTime)]
+
+    return {"departures": departures}
 
 @route('/addtimetable')
 def add_timetable(db):
@@ -229,10 +282,29 @@ def getnearestsop(db, mc):
 
         mc.set("USERLOC:" + location, stop)
 
-    return {'id': stop.id,
-            'name': stop.name,
-            'distance': stop.distance,
-            'location': latlon_json(stop.geo)
+    # Quick botch to use the Gate house times for engineering
+    stop_id = 8 if stop.id == 9 else stop.id
+
+    now_time = datetime.datetime.utcnow().time()
+    bus = mc.get("USERSTOP:" +  str(stop_id) + "USERTIME:" + now_time.strftime("%H%M"))
+    if not bus:
+        bus = db.query(DepartureTime).filter_by(bus_stop_id=stop_id).\
+                                      filter(DepartureTime.time >= now_time).\
+                                      order_by('time').first()
+
+        if bus:
+            bus = bus.to_JSON()
+
+        mc.set("USERSTOP:" +  str(stop_id) + "USERTIME:" + now_time.strftime("%H%M"), bus)
+
+    return {
+            'stop': {
+                'id': stop.id,
+                'name': stop.name,
+                'distance': stop.distance,
+                'location': latlon_json(stop.geo)
+                },
+            'next_bus': bus
             }
 
 @route('/delete')
