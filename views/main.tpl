@@ -128,7 +128,6 @@
 
     $('#updateButton').click(function(event){
         if (navigator.onLine) {
-            $('#offlineError').hide();
             this.disabled = true;
             $(this).find('.fa-compass').addClass('fa-spin')
             $(this).contents().last()[0].textContent=' Getting Location';
@@ -137,8 +136,16 @@
                                         error_callback,
                                         {enableHighAccuracy:true}
             );
-        }else{
+        }
+    });
+
+    $(window).on('online offline', function(event){
+        if (event.type==="offline"){
             $('#offlineError').show();
+            $('#updateButton').prop('disabled', true);
+        }else{
+            $('#offlineError').hide();
+            $('#updateButton').prop('disabled', false);
         }
     });
 </script>
