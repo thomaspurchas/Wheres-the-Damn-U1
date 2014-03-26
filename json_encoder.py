@@ -5,6 +5,8 @@ class MyJsonEncoder(json.JSONEncoder):
             return str(obj.isoformat())
         elif isinstance(obj, datetime.date):
             return str(obj.isoformat())
+        elif isinstance(obj, datetime.time):
+            return str(obj.isoformat())
         return json.JSONEncoder.default(self, obj)
 
 Plugin = bottle.JSONPlugin(json_dumps=lambda s: json.dumps(s, cls=MyJsonEncoder))
