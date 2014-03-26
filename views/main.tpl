@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-    <title>Hey There!</title>
+    <title>WTHTU1</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
     <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
     <script src="/static/geoPosition.js" type="text/javascript" charset="utf-8"></script>
@@ -27,9 +27,14 @@
     #loc, #nearest {
         white-space: nowrap;
     }
+    #lastUpdate {
+        color: #b9b9b9;
+    }
     </style>
 </head>
 <body>
+
+<h1>Where the hell's the U1?</h1>
 
 <p>Your location is: <span id="loc">...</span></p>
 
@@ -42,12 +47,14 @@
         <i class="fa fa-compass fa-spin"></i>
         Getting Location
     </button>
+    <small id="lastUpdate">Last Update: Never</small>
 </p>
 
 <script type="text/javascript">
     var locElmt = document.getElementById("loc");
     var nearestElmt = document.getElementById("nearest");
     var busElmt = document.getElementById("bus");
+    var updateElmt = document.getElementById("lastUpdate");
     if(geoPosition.init()){  // Geolocation Initialisation
         geoPosition.getCurrentPosition(success_callback,error_callback,{enableHighAccuracy:true});
     } else {
@@ -65,11 +72,19 @@
         coords = p.coords;
         locElmt.innerHTML = coords.latitude + ", " + coords.longitude;
 
+        var currentdate = new Date();
+        var update_datetime = "Last Update: "
+                + currentdate.getHours() + ":"
+                + currentdate.getMinutes() + ":"
+                + currentdate.getSeconds();
+
         $.getJSON("/nearest", {
             lat: coords.latitude,
             lon: coords.longitude
         })
           .done(function(data){
+            lastUpdate.innerHTML = update_datetime;
+
             nearestElmt.innerHTML = data.stop.name + ", ~" +
                 Math.round(data.stop.distance) + "m away";
 
