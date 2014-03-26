@@ -33,6 +33,9 @@
     #updateError {
         display: None;
     }
+    #offlineError {
+        display: None;
+    }
     </style>
 </head>
 <body>
