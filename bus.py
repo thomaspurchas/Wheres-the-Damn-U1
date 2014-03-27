@@ -24,7 +24,7 @@ DATABASE_URL = os.environ.get("DATABASE_URL", 'postgresql://kjntea_omsysv:35deb1
 MEMCACHEDCLOUD_SERVERS = os.environ.get('MEMCACHEDCLOUD_SERVERS', 'localhost:11211').split(',')
 
 Base = declarative_base()
-engine = create_engine(DATABASE_URL, echo=DEBUG)
+engine = create_engine(DATABASE_URL, echo=DEBUG, pool_recycle=3600)
 
 plugin = sqlalchemy.Plugin(
     engine, # SQLAlchemy engine created with create_engine function.
