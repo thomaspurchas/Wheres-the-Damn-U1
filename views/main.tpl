@@ -81,7 +81,7 @@
     var updateElmt = document.getElementById("lastUpdate");
     var updateButton = $('#updateButton');
     if(geoPosition.init()){  // Geolocation Initialisation
-        geoPosition.getCurrentPosition(success_callback,error_callback,{enableHighAccuracy:true});
+        geoPosition.getCurrentPosition(success_callback,error_callback,{enableHighAccuracy:true, maximumAge:1000});
     } else {
             // You cannot use Geolocation in this device
         locElmt.innerHTML = "Damn, can't get your location. Sorry :(";
