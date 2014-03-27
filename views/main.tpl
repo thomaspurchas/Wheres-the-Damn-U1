@@ -36,6 +36,9 @@
     #offlineError {
         display: None;
     }
+    #accuracyWarning {
+        display: None;
+    }
     </style>
 </head>
 <body>
@@ -51,6 +54,12 @@
 <div class="alert alert-danger" id="updateError">
 <strong>Oh snap!</strong> We couldn't get the latest bus data :(
 <pre id="errorMessage"></pre>
+</div>
+
+<div class="alert alert-warning" id="accuracyWarning">
+    <strong>Rubbish Location Data!</strong>
+    The accuracy of the location data your device gave me is pretty crap,
+    the bus stop picked is really just a guess I'm afraid :(
 </div>
 
 <div class="alert alert-warning" id="offlineError">
@@ -70,6 +79,7 @@
     var nearestElmt = document.getElementById("nearest");
     var busElmt = document.getElementById("bus");
     var updateElmt = document.getElementById("lastUpdate");
+    var updateButton = $('#updateButton');
     if(geoPosition.init()){  // Geolocation Initialisation
         geoPosition.getCurrentPosition(success_callback,error_callback,{enableHighAccuracy:true});
     } else {
@@ -81,13 +91,18 @@
     function success_callback(p) {
         // p.latitude : latitude value
         // p.longitude : longitude value
-        var updateButton = $('#updateButton');
         updateButton.contents().last()[0].textContent=' Getting Bus Info';
 
         coords = p.coords;
         locElmt.innerHTML = coords.latitude + ", " + coords.longitude +
             "<br/>Location Accuracy is " +
             Math.round(coords.accuracy) + "m";;
+
+        if (coords.accuracy >= 300) {
+            $('#accuracyWarning').show();
+        }else{
+            $('#accuracyWarning').hide();
+        }
 
         var currentdate = new Date();
         var update_datetime = "Last Update: "
@@ -127,6 +142,9 @@
     function error_callback(p){
         // p.message : error message
         locElmt.innerHTML = "Damn, can't get your location. Sorry :(";
+        updateButton.prop('disabled', false);
+        updateButton.find('.fa-compass').removeClass('fa-spin');
+        updateButton.contents().last()[0].textContent=' Update Bus Info';
     }
 
     $('#updateButton').click(function(event){
