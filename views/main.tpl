@@ -85,7 +85,9 @@
         updateButton.contents().last()[0].textContent=' Getting Bus Info';
 
         coords = p.coords;
-        locElmt.innerHTML = coords.latitude + ", " + coords.longitude;
+        locElmt.innerHTML = coords.latitude + ", " + coords.longitude +
+            "<br/>Location Accuracy is " +
+            Math.round(coords.accuracy) + "m";;
 
         var currentdate = new Date();
         var update_datetime = "Last Update: "
