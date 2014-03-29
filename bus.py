@@ -2,10 +2,10 @@
 
 from bottle import route, request, run, template, install, static_file
 from bottle.ext import sqlalchemy
-from sqlalchemy import create_engine, Column, Integer, Sequence, String, Enum, ForeignKey, Date, Time, UniqueConstraint
+from sqlalchemy import create_engine, Column, Integer, Sequence, String, ForeignKey, Date, Time, UniqueConstraint, Boolean
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.dialects import postgresql
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from geoalchemy2 import Geography
 
 import bmemcache_plugin
@@ -62,34 +62,6 @@ class BusStop(Base):
         return "BusStop('%s', '%s', '%s')" % (self.id, self.name, self.location)
 
 
-class DepartureTime(Base):
-    __tablename__ = "Departures"
-
-    id = Column(Integer, Sequence('departures_id_seq'), primary_key=True)
-    timetable_id = Column(ForeignKey('Timetables.id'), nullable=False)
-    bus_stop_id = Column(ForeignKey('BusStops.id'), nullable=False)
-    valid_days = Column(postgresql.ARRAY(String), nullable=False)
-    time = Column(Time(), nullable=False)
-    destination = Column(String(50))
-
-    timetable = relationship("Timetable", backref=backref('departure_times', order_by=id))
-    bus_stop = relationship("BusStop", backref=backref('departure_times', order_by=id))
-
-    __table_args__ = (
-        UniqueConstraint('timetable_id', 'time', 'destination', 'valid_days'),
-        )
-
-    def to_JSON(self):
-        return {
-            'id': self.id,
-            'timetable': self.timetable_id,
-            'route_number': self.timetable.route.number,
-            'destination': self.destination,
-            'time': self.time,
-            'valid_days': self.valid_days
-        }
-
-
 class Timetable(Base):
     __tablename__ = "Timetables"
 
@@ -110,6 +82,57 @@ class Timetable(Base):
             'valid_from': self.valid_from,
             'valid_to': self.valid_to
         }
+
+class DepartureTimeBase(Base):
+    __abstract__ = True
+
+    id = Column(Integer, Sequence('departures_id_seq'), primary_key=True)
+    valid_days = Column(postgresql.ARRAY(String), nullable=False)
+    time = Column(Time(), nullable=False)
+    destination = Column(String(50))
+
+    @declared_attr
+    def timetable_id(cls):
+        return Column(ForeignKey('Timetables.id'), nullable=False)
+
+    @declared_attr
+    def bus_stop_id(cls):
+        return Column(ForeignKey('BusStops.id'), nullable=False)
+
+    __table_args__ = (
+        UniqueConstraint('timetable_id', 'time', 'destination', 'valid_days'),
+        )
+
+    def to_JSON(self):
+        return {
+            'id': self.id,
+            'timetable': self.timetable_id,
+            'route_number': self.timetable.route.number,
+            'destination': self.destination,
+            'time': self.time,
+            'valid_days': self.valid_days,
+            'guessed': False
+        }
+
+class DepartureTime(DepartureTimeBase):
+    __tablename__ = "Departures"
+
+    timetable = relationship("Timetable", backref='departure_times')
+    bus_stop = relationship("BusStop", backref='departure_times')
+
+class DepartureTimeDeref(DepartureTimeBase):
+    # Uses the defereneced departures table to deal with time deltas.
+    __tablename__ = "Departures_dereferenced"
+
+    generated = Column(Boolean)
+
+    timetable = relationship("Timetable")
+    bus_stop = relationship("BusStop")
+
+    def to_JSON(self):
+        JSON = super(DepartureTimeDeref, self).to_JSON()
+        JSON['guessed'] = self.generated
+        return JSON
 
 class Route(Base):
     __tablename__ = "Routes"
