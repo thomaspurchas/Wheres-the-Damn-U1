@@ -267,6 +267,25 @@ def getstops(db):
 
     return {"bus_stops": stops}
 
+
+def get_next_bus(mc, db, stop_id):
+    now_time = datetime.datetime.utcnow().time()
+
+    print db.query(DepartureTime)
+
+    bus = mc.get("USERSTOP:" +  str(stop_id) + "USERTIME:" + now_time.strftime("%H%M"))
+    if not bus:
+        bus = db.query(DepartureTimeDeref).filter_by(bus_stop_id=stop_id).\
+                                      filter(DepartureTimeDeref.time >= now_time).\
+                                      order_by('time').first()
+
+        if bus:
+            bus = bus.to_JSON()
+
+        mc.set("USERSTOP:" +  str(stop_id) + "USERTIME:" + now_time.strftime("%H%M"), bus)
+
+    return bus
+
 @route('/nearest')
 def getnearestsop(db, mc):
     location = (float(request.query.decode()['lon']), float(request.query.decode()['lat']))
@@ -285,17 +304,7 @@ def getnearestsop(db, mc):
     # Quick botch to use the Gate house times for engineering
     stop_id = 8 if stop.id == 9 else stop.id
 
-    now_time = datetime.datetime.utcnow().time()
-    bus = mc.get("USERSTOP:" +  str(stop_id) + "USERTIME:" + now_time.strftime("%H%M"))
-    if not bus:
-        bus = db.query(DepartureTime).filter_by(bus_stop_id=stop_id).\
-                                      filter(DepartureTime.time >= now_time).\
-                                      order_by('time').first()
-
-        if bus:
-            bus = bus.to_JSON()
-
-        mc.set("USERSTOP:" +  str(stop_id) + "USERTIME:" + now_time.strftime("%H%M"), bus)
+    bus = get_next_bus(mc, db, stop_id)
 
     return {
             'stop': {
