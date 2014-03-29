@@ -339,6 +339,12 @@ def getnearestsop(db, mc):
             'next_bus': bus
             }
 
+@route('/next_bus')
+def api_get_next_bus(mc, db):
+    stop_id = request.query.decode()['stop_id']
+
+    return {"next_bus": get_next_bus(mc, db, stop_id)}
+
 @route('/delete')
 def deleteallstops(db):
     if DEBUG:
