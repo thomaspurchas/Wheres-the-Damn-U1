@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
     <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
     <script src="/static/geoPosition.js" type="text/javascript" charset="utf-8"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/datejs/1.0/date.min.js"></script>
 
     <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
     <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
@@ -115,7 +116,7 @@
 
         var currentdate = new Date();
         var update_datetime = "Last Update: "
-            + currentdate.toLocaleTimeString();
+            + currentdate.toString("HH:mm:ss");
         $.getJSON("/nearest", {
             lat: coords.latitude,
             lon: coords.longitude
@@ -128,7 +129,7 @@
                 Math.round(data.stop.distance) + "m away";
 
             if (data.next_bus != null){
-                busElmt.innerHTML = data.next_bus.time;
+                busElmt.innerHTML = Date.parse(data.next_bus.time).toString("HH:mm")
                 $('.routeNumber').text(data.next_bus.route_number);
             }else{
                 busElmt.innerHTML = "Sorry, that data is not avaliable at the moment :(";
