@@ -7,6 +7,7 @@ from sqlalchemy.orm import relationship, backref
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from geoalchemy2 import Geography
+import pytz
 
 import bmemcache_plugin
 import json_encoder
@@ -16,6 +17,8 @@ import os
 import datetime
 
 DAYS = ['SUN', 'MON', 'TUE', 'WED', 'THUR', 'FRI', 'SAT']
+UTC = pytz.utc
+LONDON = pytz.timezone('Europe/London')
 
 # Guess if we are running on Heroku at the moment
 HEROKU = True if os.environ.get("DATABASE_URL", None) else False
@@ -292,7 +295,8 @@ def getstops(db):
 
 
 def get_next_bus(mc, db, stop_id):
-    now_time = datetime.datetime.utcnow().time()
+    now_time = datetime.datetime.utcnow().replace(tzinfo=UTC)
+    now_time = LONDON.normalize(now_time.astimezone(LONDON)).time()
 
     print db.query(DepartureTime)
 

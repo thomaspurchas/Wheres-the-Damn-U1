@@ -7,4 +7,5 @@ newrelic==2.16.0.12
 psycopg2==2.5.2
 python-binary-memcached==0.22
 python-memcached==1.53
+pytz==2014.2
 wsgiref==0.1.2
