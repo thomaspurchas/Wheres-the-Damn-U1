@@ -298,9 +298,9 @@ def get_next_bus(mc, db, stop_id):
     now_time = datetime.datetime.utcnow().replace(tzinfo=UTC)
     now_time = LONDON.normalize(now_time.astimezone(LONDON)).time()
 
-    print db.query(DepartureTime)
+    mc_key = "V2:USERSTOP:" +  str(stop_id) + "USERTIME:" + now_time.strftime("%H%M")
 
-    bus = mc.get("USERSTOP:" +  str(stop_id) + "USERTIME:" + now_time.strftime("%H%M"))
+    bus = mc.get(mc_key)
     if not bus:
         bus = db.query(DepartureTimeDeref).filter_by(bus_stop_id=stop_id).\
                                       filter(DepartureTimeDeref.time >= now_time).\
@@ -309,7 +309,7 @@ def get_next_bus(mc, db, stop_id):
         if bus:
             bus = bus.to_JSON()
 
-        mc.set("USERSTOP:" +  str(stop_id) + "USERTIME:" + now_time.strftime("%H%M"), bus)
+        mc.set(mc_key, bus)
 
     return bus
 
