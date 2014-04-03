@@ -40,7 +40,17 @@
     #accuracyWarning {
         display: None;
     }
+    #map-canvas {
+        height: 200px;
+        max-width: 500px;
+        width: 100%;
+    }
     </style>
+
+    </style>
+    <script type="text/javascript"
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB8UbiD-uUDWxHJxR4fXgBbcBzgFFKUDCY&sensor=true">
+    </script>
 </head>
 <body>
 
@@ -51,6 +61,10 @@
 <p>Your nearest <span class="routeNumber">U1</span> bus stop is: <span id="nearest">...</span></p>
 
 <p>and the next bus is: <span id="bus">...</span></p>
+
+<p>
+    <div id="map-canvas"></div>
+</p>
 
 <div class="alert alert-danger" id="updateError">
 <strong>Oh snap!</strong> We couldn't get the latest bus data :(
@@ -82,14 +96,20 @@
     var updateElmt = document.getElementById("lastUpdate");
     var updateButton = $('#updateButton');
     var watch = null;
-    if(navigator.geolocation){
-        watch = navigator.geolocation.watchPosition(success_callback,error_callback,{enableHighAccuracy:true});
-        $('#updateButton').prop('disabled', true);
-    }else if(geoPosition.init()){  // Geolocation Initialisation
-        geoPosition.getCurrentPosition(success_callback,error_callback,{enableHighAccuracy:true, maximumAge:1000});
-    } else {
-            // You cannot use Geolocation in this device
-        locElmt.innerHTML = "Damn, can't get your location. Sorry :(";
+    var userMarker = null;
+    var busMarker = null;
+    var map = null;
+
+    function setup() {
+        if(navigator.geolocation){
+            watch = navigator.geolocation.watchPosition(success_callback,error_callback,{enableHighAccuracy:true});
+            $('#updateButton').prop('disabled', true);
+        }else if(geoPosition.init()){  // Geolocation Initialisation
+            geoPosition.getCurrentPosition(success_callback,error_callback,{enableHighAccuracy:true, maximumAge:1000});
+        } else {
+                // You cannot use Geolocation in this device
+            locElmt.innerHTML = "Damn, can't get your location. Sorry :(";
+        }
     }
 
     // p : geolocation object
@@ -114,6 +134,20 @@
             }
         }
 
+        var googUserLatLon = new google.maps.LatLng(coords.latitude, coords.longitude);
+
+        if (userMarker) { userMarker.setMap(null) }
+
+        userMarker = new google.maps.Marker({
+            position: googUserLatLon,
+            icon: {
+                url: '/static/user-marker.png',
+                anchor: new google.maps.Point(16, 16),
+            }
+        });
+
+        userMarker.setMap(map);
+
         var currentdate = new Date();
         var update_datetime = "Last Update: "
             + currentdate.toString("HH:mm:ss");
@@ -127,6 +161,25 @@
 
             nearestElmt.innerHTML = data.stop.name + ", ~" +
                 Math.round(data.stop.distance) + "m away";
+
+            var coords = data.stop.location;
+
+            var googBusLatLon = new google.maps.LatLng(coords.lat, coords.lon);
+
+            if (busMarker) {busMarker.setMap(null)}
+
+            busMarker = new google.maps.Marker({
+                position: googBusLatLon,
+                icon: {
+                    url: '/static/bus-marker.png',
+                    anchor: new google.maps.Point(16, 32),
+                }
+            });
+
+            busMarker.setMap(map);
+
+            var bounds = new google.maps.LatLngBounds(googBusLatLon, googUserLatLon);
+            map.fitBounds(bounds);
 
             if (data.next_bus != null){
                 busElmt.innerHTML = Date.parse(data.next_bus.time).toString("HH:mm")
@@ -183,6 +236,18 @@
             $('#updateButton').prop('disabled', false);
         }
     });
+
+    function initialize() {
+        var mapOptions = {
+          center: new google.maps.LatLng(52.287373, -1.548609),
+          zoom: 12,
+          streetViewControl: false
+        };
+        map = new google.maps.Map(document.getElementById("map-canvas"),
+            mapOptions);
+        }
+    google.maps.event.addDomListener(window, 'load', initialize);
+    $(setup);
 </script>
 
 </body>
