@@ -13,6 +13,9 @@
     body {
         padding: 5px;
     }
+    body h1:first-child {
+        margin-top: 0px;
+    }
     .btn:focus {
         outline: none;
     }
@@ -120,7 +123,8 @@
         updateButton.contents().last()[0].textContent=' Getting Bus Info';
 
         coords = p.coords;
-        locElmt.innerHTML = coords.latitude + ", " + coords.longitude +
+        locElmt.innerHTML = Math.round(coords.latitude*10000)/10000 + ", " +
+            Math.round(coords.longitude*10000)/10000 +
             "<br/>Location Accuracy is " +
             Math.round(coords.accuracy) + "m";;
 
