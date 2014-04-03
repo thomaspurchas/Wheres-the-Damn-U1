@@ -364,6 +364,10 @@ def show_home():
 def callback(path):
     return static_file(path, root="./static/")
 
+@route('/apple-touch-icon.png')
+def apple_touch_icon():
+    return static_file('apple-touch-icon.png', root="./static/")
+
 def latlon_json(geoStr):
     geoJSON = json.loads(geoStr)
     cords = geoJSON['coordinates']
