@@ -3,7 +3,7 @@
 from bottle import route, request, run, template, install, static_file
 from bottle.ext import sqlalchemy
 from sqlalchemy import create_engine, Column, Integer, Sequence, String, ForeignKey, Date, Time, UniqueConstraint, Boolean
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy.orm import relationship, backref, joinedload
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from geoalchemy2 import Geography
@@ -74,7 +74,7 @@ class Timetable(Base):
     valid_from = Column(Date, nullable=False)
     valid_to = Column(Date, nullable=False)
 
-    route = relationship("Route", backref=backref('timetables', order_by=id))
+    route = relationship("Route", backref=backref('timetables', order_by=id), lazy='joined')
 
     def to_JSON(self):
         return {
@@ -120,7 +120,7 @@ class DepartureTimeBase(Base):
 class DepartureTime(DepartureTimeBase):
     __tablename__ = "Departures"
 
-    timetable = relationship("Timetable", backref='departure_times')
+    timetable = relationship("Timetable", backref='departure_times', lazy='joined')
     bus_stop = relationship("BusStop", backref='departure_times')
 
 class DepartureTimeDeref(DepartureTimeBase):
@@ -129,7 +129,7 @@ class DepartureTimeDeref(DepartureTimeBase):
 
     generated = Column(Boolean)
 
-    timetable = relationship("Timetable")
+    timetable = relationship("Timetable", lazy='joined')
     bus_stop = relationship("BusStop")
 
     def to_JSON(self):
@@ -304,7 +304,9 @@ def get_next_bus(mc, db, stop_id):
     if not bus:
         bus = db.query(DepartureTimeDeref).filter_by(bus_stop_id=stop_id).\
                                       filter(DepartureTimeDeref.time >= now_time).\
-                                      order_by('time').first()
+                                      order_by('time').\
+                                      options(joinedload(DepartureTimeDeref.timetable, Timetable.route)).\
+                                      first()
 
         if bus:
             bus = bus.to_JSON()
