@@ -3,8 +3,9 @@ SQLAlchemy==0.9.3
 bottle==0.12.5
 bottle-sqlalchemy==0.4.1
 gunicorn==18.0
-newrelic==2.16.0.12
+newrelic==2.18.1.15
 psycopg2==2.5.2
+py2-ipaddress==2.0
 python-binary-memcached==0.22
 python-memcached==1.53
 pytz==2014.2
