@@ -149,7 +149,9 @@
             position: googUserLatLon,
             icon: {
                 url: '/static/user-marker.png',
-                anchor: new google.maps.Point(16, 16),
+                anchor: new google.maps.Point(8, 8),
+                scaledSize: new google.maps.Size(16, 16),
+                size: new google.maps.Size(32, 32)
             }
         });
 
@@ -180,6 +182,8 @@
                 icon: {
                     url: '/static/bus-marker.png',
                     anchor: new google.maps.Point(16, 32),
+                    scaledSize: new google.maps.Size(32, 32),
+                    size: new google.maps.Size(64, 64)
                 }
             });
 
