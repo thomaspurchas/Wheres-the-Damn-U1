@@ -103,6 +103,7 @@
     var watch = null;
     var userMarker = null;
     var busMarker = null;
+    var accuracyCircle = null;
     var map = null;
 
     function setup() {
@@ -156,6 +157,21 @@
         });
 
         userMarker.setMap(map);
+
+        if (accuracyCircle) { accuracyCircle.setMap(null) }
+
+        var accuracyCircleOptions = {
+            strokeColor: '#5191E7',
+            strokeOpacity: 0.8,
+            strokeWeight: 1,
+            fillColor: '#5191E7',
+            fillOpacity: 0.35,
+            center: googUserLatLon,
+            radius: coords.accuracy
+        };
+
+        accuracyCircle = new google.maps.Circle(accuracyCircleOptions);
+        accuracyCircle.setMap(map);
 
         var currentdate = new Date();
         var update_datetime = "Last Update: "
