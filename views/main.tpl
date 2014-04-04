@@ -128,10 +128,6 @@
             }
         });
 
-        if (!navigator.onLine) {
-            $('#offlineError').show();
-        }
-
         $(window).on('online offline', function(event){
             if (event.type==="offline"){
                 $('#offlineError').show();
@@ -141,6 +137,11 @@
                 $('#updateButton').prop('disabled', false);
             }
         });
+
+        if (!navigator.onLine) {
+            $(window).trigger('offline');
+        }
+
 
         if(navigator.geolocation){
             watch = navigator.geolocation.watchPosition(success_callback,error_callback,{enableHighAccuracy:true});
