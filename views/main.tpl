@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html>
+<html manifest="/static/bus.appcache">
 <head>
     <title>WTHTU1</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
@@ -39,29 +39,33 @@
         color: #b9b9b9;
     }
     #updateError {
-        display: None;
+        display: none;
     }
     #offlineError {
-        display: None;
+        display: none;
     }
     #accuracyWarning {
-        display: None;
+        display: none;
     }
     #map-canvas {
         height: 200px;
         max-width: 500px;
         width: 100%;
+        display: none;
     }
     </style>
 
     </style>
-    <script type="text/javascript"
-      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB8UbiD-uUDWxHJxR4fXgBbcBzgFFKUDCY&sensor=true">
-    </script>
 </head>
 <body>
 
 <h1>Where the hell's the <span class="routeNumber">U1</span>?</h1>
+
+<div class="alert alert-danger" id="offlineError">
+    <strong>Offline!</strong>
+    There doesn't appear to be an internet connection so I can't get the latest
+    bus data :(
+</div>
 
 <p>Your location is: <span id="loc">...</span></p>
 
@@ -84,10 +88,6 @@
     the bus stop picked is really just a guess I'm afraid :(
 </div>
 
-<div class="alert alert-warning" id="offlineError">
-    <strong>Offline!</strong> There doesn't appear to be an internet connection :(
-</div>
-
 <p>
     <button type="button" class="btn btn-default" id="updateButton" disabled>
         <i class="fa fa-compass fa-spin"></i>
@@ -107,9 +107,41 @@
     var busMarker = null;
     var accuracyCircle = null;
     var map = null;
+    var userCoords = null;
+    var stopCoords = null;
 
     function setup() {
-        initializeMap();
+        $('#updateButton').click(function(event){
+            if (navigator.onLine) {
+                this.disabled = true;
+                $(this).find('.fa-compass').addClass('fa-spin')
+                $(this).contents().last()[0].textContent=' Getting Location';
+                if(navigator.geolocation){
+                    watch = navigator.geolocation.watchPosition(success_callback,error_callback,{enableHighAccuracy:true});
+                }else{
+                    geoPosition.getCurrentPosition(
+                                                success_callback,
+                                                error_callback,
+                                                {enableHighAccuracy:true}
+                    );
+                }
+            }
+        });
+
+        if (!navigator.onLine) {
+            $('#offlineError').show();
+        }
+
+        $(window).on('online offline', function(event){
+            if (event.type==="offline"){
+                $('#offlineError').show();
+                $('#updateButton').prop('disabled', true);
+            }else{
+                $('#offlineError').hide();
+                $('#updateButton').prop('disabled', false);
+            }
+        });
+
         if(navigator.geolocation){
             watch = navigator.geolocation.watchPosition(success_callback,error_callback,{enableHighAccuracy:true});
             $('#updateButton').prop('disabled', true);
@@ -144,36 +176,8 @@
             }
         }
 
-        var googUserLatLon = new google.maps.LatLng(coords.latitude, coords.longitude);
-
-        if (userMarker) { userMarker.setMap(null) }
-
-        userMarker = new google.maps.Marker({
-            position: googUserLatLon,
-            icon: {
-                url: '/static/user-marker.png',
-                anchor: new google.maps.Point(8, 8),
-                scaledSize: new google.maps.Size(16, 16),
-                size: new google.maps.Size(32, 32)
-            }
-        });
-
-        userMarker.setMap(map);
-
-        if (accuracyCircle) { accuracyCircle.setMap(null) }
-
-        var accuracyCircleOptions = {
-            strokeColor: '#5191E7',
-            strokeOpacity: 0.8,
-            strokeWeight: 1,
-            fillColor: '#5191E7',
-            fillOpacity: 0.35,
-            center: googUserLatLon,
-            radius: coords.accuracy
-        };
-
-        accuracyCircle = new google.maps.Circle(accuracyCircleOptions);
-        accuracyCircle.setMap(map);
+        userCoords = coords;
+        placeUserMarker();
 
         var currentdate = new Date();
         var update_datetime = "Last Update: "
@@ -189,26 +193,8 @@
             nearestElmt.innerHTML = data.stop.name + ", ~" +
                 Math.round(data.stop.distance) + "m away";
 
-            var coords = data.stop.location;
-
-            var googBusLatLon = new google.maps.LatLng(coords.lat, coords.lon);
-
-            if (busMarker) {busMarker.setMap(null)}
-
-            busMarker = new google.maps.Marker({
-                position: googBusLatLon,
-                icon: {
-                    url: '/static/bus-marker.png',
-                    anchor: new google.maps.Point(16, 32),
-                    scaledSize: new google.maps.Size(32, 32),
-                    size: new google.maps.Size(64, 64)
-                }
-            });
-
-            busMarker.setMap(map);
-
-            var bounds = new google.maps.LatLngBounds(googBusLatLon, googUserLatLon);
-            map.fitBounds(bounds);
+            stopCoords = data.stop.location;
+            placeStopMarker();
 
             if (data.next_bus != null){
                 busElmt.innerHTML = Date.parse(data.next_bus.time).toString("HH:mm")
@@ -239,32 +225,69 @@
         updateButton.contents().last()[0].textContent=' Update Bus Info';
     }
 
-    $('#updateButton').click(function(event){
-        if (navigator.onLine) {
-            this.disabled = true;
-            $(this).find('.fa-compass').addClass('fa-spin')
-            $(this).contents().last()[0].textContent=' Getting Location';
-            if(navigator.geolocation){
-                watch = navigator.geolocation.watchPosition(success_callback,error_callback,{enableHighAccuracy:true});
-            }else{
-                geoPosition.getCurrentPosition(
-                                            success_callback,
-                                            error_callback,
-                                            {enableHighAccuracy:true}
-                );
-            }
-        }
-    });
+    function placeUserMarker() {
+        if (map) {
+            var coords = userCoords;
 
-    $(window).on('online offline', function(event){
-        if (event.type==="offline"){
-            $('#offlineError').show();
-            $('#updateButton').prop('disabled', true);
-        }else{
-            $('#offlineError').hide();
-            $('#updateButton').prop('disabled', false);
+            if (userMarker) { userMarker.setMap(null) }
+
+            var googUserLatLon = new google.maps.LatLng(coords.latitude, coords.longitude);
+
+            userMarker = new google.maps.Marker({
+                position: googUserLatLon,
+                icon: {
+                    url: '/static/user-marker.png',
+                    anchor: new google.maps.Point(8, 8),
+                    scaledSize: new google.maps.Size(16, 16),
+                    size: new google.maps.Size(32, 32)
+                }
+            });
+
+            userMarker.setMap(map);
+
+            if (accuracyCircle) { accuracyCircle.setMap(null) }
+
+            var accuracyCircleOptions = {
+                strokeColor: '#5191E7',
+                strokeOpacity: 0.8,
+                strokeWeight: 1,
+                fillColor: '#5191E7',
+                fillOpacity: 0.35,
+                center: googUserLatLon,
+                radius: coords.accuracy
+            };
+
+            accuracyCircle = new google.maps.Circle(accuracyCircleOptions);
+            accuracyCircle.setMap(map);
         }
-    });
+    }
+
+    function placeStopMarker() {
+        if (map) {
+
+            var coords = stopCoords;
+
+            var googBusLatLon = new google.maps.LatLng(coords.lat, coords.lon);
+            var googUserLatLon = new google.maps.LatLng(userCoords.latitude, userCoords.longitude);
+
+            if (busMarker) {busMarker.setMap(null)}
+
+            busMarker = new google.maps.Marker({
+                position: googBusLatLon,
+                icon: {
+                    url: '/static/bus-marker.png',
+                    anchor: new google.maps.Point(16, 32),
+                    scaledSize: new google.maps.Size(32, 32),
+                    size: new google.maps.Size(64, 64)
+                }
+            });
+
+            busMarker.setMap(map);
+
+            var bounds = new google.maps.LatLngBounds(googBusLatLon, googUserLatLon);
+            map.fitBounds(bounds);
+        }
+    }
 
     function initializeMap() {
         var mapOptions = {
@@ -274,8 +297,59 @@
         };
         map = new google.maps.Map(document.getElementById("map-canvas"),
             mapOptions);
+
+        if (userCoords) {
+            placeUserMarker();
         }
-    $(setup);
+        if (stopCoords) {
+            placeStopMarker();
+        }
+
+        $('#map-canvas').show();
+    }
+
+    function loadMapsScript() {
+        var script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.src = '//maps.googleapis.com/maps/api/js?key=AIzaSyB8UbiD-uUDWxHJxR4fXgBbcBzgFFKUDCY&sensor=true&' +
+          'callback=initializeMap';
+        document.body.appendChild(script);
+    }
+
+    var AppCacheTimeout = -1;
+    function AppCacheReady() {
+        clearTimeout(AppCacheTimeout);
+        window.applicationCache.removeEventListener('noupdate',
+            arguments.callee, false);
+        window.applicationCache.removeEventListener('cached',
+            arguments.callee, false);
+
+        $(setup);
+        loadMapsScript();
+
+        //Load the external api (dynamic script insertion),
+        //  initalize the page, etc....
+    }
+    if (window.applicationCache && window.applicationCache.status != window.applicationCache.UNCACHED) {
+        AppCacheTimeout = setTimeout(AppCacheReady, 2000);
+
+        window.applicationCache.addEventListener('updateready', function () {
+            window.applicationCache.swapCache();
+            location.reload();
+        }, false);
+        window.applicationCache.addEventListener('obsolete',function () {
+            window.location.reload(true);
+        }, false);
+        window.applicationCache.addEventListener('noupdate', AppCacheReady,
+            false);
+        window.applicationCache.addEventListener('cached', AppCacheReady,
+            false);
+        window.applicationCache.addEventListener('error', function() {
+        // provide user feedback - your page is probably broken.
+        }, false);
+    } else {
+        AppCacheReady();
+    }
 </script>
 
 </body>
