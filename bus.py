@@ -2,7 +2,7 @@
 
 from bottle import route, request, run, template, install, static_file
 from bottle.ext import sqlalchemy
-from sqlalchemy import create_engine, Column, Integer, Sequence, String, ForeignKey, Date, Time, UniqueConstraint, Boolean
+from sqlalchemy import create_engine, Column, Integer, Sequence, String, ForeignKey, Date, Time, UniqueConstraint, Boolean, cast, literal_column
 from sqlalchemy.orm import relationship, backref, joinedload
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
@@ -16,7 +16,7 @@ import json
 import os
 import datetime
 
-DAYS = ['SUN', 'MON', 'TUE', 'WED', 'THUR', 'FRI', 'SAT']
+DAYS = ['MON', 'TUE', 'WED', 'THUR', 'FRI', 'SAT', 'SUN', 'MON'] # Place MON at the end so that we can always get tomorrow by adding 1
 UTC = pytz.utc
 LONDON = pytz.timezone('Europe/London')
 
@@ -33,7 +33,6 @@ plugin = sqlalchemy.Plugin(
     engine, # SQLAlchemy engine created with create_engine function.
     Base.metadata, # SQLAlchemy metadata, required only if create=True.
     keyword='db', # Keyword used to inject session database in a route (default 'db').
-    create=True, # If it is true, execute `metadata.create_all(engine)` when plugin is applied (default False).
 )
 
 install(plugin)
@@ -296,20 +295,32 @@ def getstops(db):
 
 def get_next_bus(mc, db, stop_id):
     now_time = datetime.datetime.utcnow().replace(tzinfo=UTC)
-    now_time = LONDON.normalize(now_time.astimezone(LONDON)).time()
+    now_time = LONDON.normalize(now_time.astimezone(LONDON))
+    now_day = now_time.weekday()
+    now_time = now_time.time()
 
-    mc_key = "V2:USERSTOP:" +  str(stop_id) + "USERTIME:" + now_time.strftime("%H%M")
+    mc_key = "V2:USERSTOP:" +  str(stop_id) + "USERTIME:" + now_time.strftime("%w%H%M")
 
     bus = mc.get(mc_key)
     if not bus:
-        bus = db.query(DepartureTimeDeref).filter_by(bus_stop_id=stop_id).\
+        today_query = db.query(DepartureTimeDeref, literal_column("0").label("query_order")).\
+                                      filter_by(bus_stop_id=stop_id).\
                                       filter(DepartureTimeDeref.time >= now_time).\
-                                      order_by('time').\
-                                      options(joinedload(DepartureTimeDeref.timetable, Timetable.route)).\
-                                      first()
+                                      filter(DepartureTimeDeref.valid_days.contains(cast([DAYS[now_day]], postgresql.ARRAY(String))))
+
+        tomorrow_query = db.query(DepartureTimeDeref, literal_column("1").label("query_order")).\
+                                      filter_by(bus_stop_id=stop_id).\
+                                      filter(DepartureTimeDeref.valid_days.contains(cast([DAYS[now_day + 1]], postgresql.ARRAY(String))))
+
+
+        bus = today_query.union_all(tomorrow_query).\
+                            options(joinedload(DepartureTimeDeref.timetable, Timetable.route)).\
+                            order_by("query_order").\
+                            order_by(DepartureTimeDeref.time).\
+                            first()
 
         if bus:
-            bus = bus.to_JSON()
+            bus = bus[0].to_JSON() #We only want the departure time object, not the virtual query_order column
 
         mc.set(mc_key, bus)
 
