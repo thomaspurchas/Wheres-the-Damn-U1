@@ -337,7 +337,8 @@
 
             busMarker.setMap(map);
 
-            var bounds = new google.maps.LatLngBounds(googBusLatLon, googUserLatLon);
+            var bounds = new google.maps.LatLngBounds(googBusLatLon);
+            bounds = bounds.extend(googUserLatLon);
             map.fitBounds(bounds);
         }
     }
