@@ -237,12 +237,14 @@
             updateButton.contents().last()[0].textContent=' Update Bus Info';
           })
           .fail(function( jqxhr, textStatus, error ) {
-            updateButton.prop('disabled', false);
-            updateButton.find('.fa-compass').removeClass('fa-spin');
-            updateButton.contents().last()[0].textContent=' Update Bus Info';
-            var err = textStatus + ", " + error;
-            $('#errorMessage').text(err);
-            $('#updateError').show();
+            if (navigator.onLine) {
+                updateButton.prop('disabled', false);
+                updateButton.find('.fa-compass').removeClass('fa-spin');
+                updateButton.contents().last()[0].textContent=' Update Bus Info';
+                var err = textStatus + ", " + error;
+                $('#errorMessage').text(err);
+                $('#updateError').show();
+            }
           });
     }
 
