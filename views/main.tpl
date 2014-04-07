@@ -208,7 +208,7 @@
                         latitude: 52.382412,
                         accuracy: 50
                     }
-                    success_callback({coords:coords}f);
+                    success_callback({coords:coords});
                 }
             });
     }
