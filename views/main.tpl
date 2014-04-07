@@ -370,7 +370,8 @@
                 $('#bus').text('...');
                 $('#busTime').text('');
                 $('#bus').removeClass('text-danger');
-                // $('#updateButton').click();
+                $('#updateButton').click();
+                nextBus = null;
             }
         }
 
