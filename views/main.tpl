@@ -208,7 +208,7 @@
                         latitude: 52.382412,
                         accuracy: 50
                     }
-                    success_callback({coords:coords});
+                    success_callback({coords:coords}f);
                 }
             });
     }
@@ -217,7 +217,6 @@
     function success_callback(p) {
         // p.latitude : latitude value
         // p.longitude : longitude value
-        window.clearTimeout(watchTimeout);
 
         coords = p.coords;
         locElmt.innerHTML = Math.round(coords.latitude*10000)/10000 + ", " +
@@ -233,6 +232,7 @@
             if(watch!=null){
                 navigator.geolocation.clearWatch(watch);
                 watch = null;
+                window.clearTimeout(watchTimeout);
             }
         }
 
