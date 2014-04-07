@@ -33,6 +33,10 @@
     .btn-default:focus {
         background-color: white;
     }
+    .update *{
+        display: inline-block;
+        vertical-align: top;
+    }
     #loc, #nearest {
         white-space: nowrap;
     }
@@ -90,12 +94,12 @@
     the bus stop picked is really just a guess I'm afraid :(
 </div>
 
-<p>
+<p class="update">
     <button type="button" class="btn btn-default" id="updateButton" disabled>
         <i class="fa fa-compass fa-spin"></i>
         Getting Location
     </button>
-    <small class="grey">Last Update: <span id="lastUpdate">Never<span></small>
+    <small class="grey">Last Update:<br/><span id="lastUpdate">Never<span></small>
 </p>
 
 <script type="text/javascript">
