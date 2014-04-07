@@ -135,6 +135,7 @@
     var updateTimeout = null;
     var updateInterval = 20000; // Update the timers every 20 seconds
     var watch = null;
+    var watchTimeout = null;
     var userMarker = null;
     var busMarker = null;
     var accuracyCircle = null;
@@ -150,6 +151,7 @@
                 $(this).contents().last()[0].textContent=' Getting Location';
                 if(navigator.geolocation){
                     watch = navigator.geolocation.watchPosition(success_callback,error_callback,{enableHighAccuracy:true});
+                    watchTimeout = window.setTimeout(cancelGeoWatch, 5000);
                 }else{
                     geoPosition.getCurrentPosition(
                                                 success_callback,
@@ -176,10 +178,9 @@
 
 
         if(navigator.geolocation){
-            watch = navigator.geolocation.watchPosition(success_callback,error_callback,{enableHighAccuracy:true});
-            $('#updateButton').prop('disabled', true);
+            $('#updateButton').click();
         }else if(geoPosition.init()){  // Geolocation Initialisation
-            geoPosition.getCurrentPosition(success_callback,error_callback,{enableHighAccuracy:true, maximumAge:1000});
+            $('#updateButton').click();
         } else {
                 // You cannot use Geolocation in this device
             locElmt.innerHTML = "Damn, can't get your location. Sorry :(";
@@ -197,10 +198,26 @@
         updateTimers(); // Get the ball rolling
     }
 
+    function cancelGeoWatch() {
+        navigator.geolocation.clearWatch(watch);
+        $.getJSON("http://ip.jerix.co.uk")
+            .done(function(data) {
+                if (data.campus) {
+                    var coords = {
+                        longitude: -1.562044,
+                        latitude: 52.382412,
+                        accuracy: 50
+                    }
+                    success_callback({coords:coords});
+                }
+            });
+    }
+
     // p : geolocation object
     function success_callback(p) {
         // p.latitude : latitude value
         // p.longitude : longitude value
+        window.clearTimeout(watchTimeout);
 
         coords = p.coords;
         locElmt.innerHTML = Math.round(coords.latitude*10000)/10000 + ", " +
