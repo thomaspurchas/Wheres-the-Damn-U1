@@ -222,7 +222,7 @@
         locElmt.innerHTML = Math.round(coords.latitude*10000)/10000 + ", " +
             Math.round(coords.longitude*10000)/10000 +
             "<br/>Location Accuracy is " +
-            Math.round(coords.accuracy) + "m";;
+            Math.round(coords.accuracy) + "m";
 
         if (coords.accuracy >= 300) {
             if (watch==null) return;
