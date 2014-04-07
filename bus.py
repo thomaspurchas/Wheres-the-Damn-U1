@@ -299,7 +299,7 @@ def get_next_bus(mc, db, stop_id):
     now_day = now_time.weekday()
     now_time = now_time.time()
 
-    mc_key = "V2:USERSTOP:" +  str(stop_id) + "USERTIME:" + now_time.strftime("%w%H%M")
+    mc_key = "V3:USERSTOP:" +  str(stop_id) + "USERTIME:" + now_time.strftime("%w%H%M")
 
     bus = mc.get(mc_key)
     if not bus:
@@ -320,23 +320,23 @@ def get_next_bus(mc, db, stop_id):
                             first()
 
         if bus:
-            departure = bus[0]
-
-            # Create a day delta, is this departure time today or tomorrow?
-            day_delta = datetime.timedelta(days = int(bus[1]))
-            departure_day = datetime.date.today() + day_delta
-
-            departure_dt = datetime.datetime.combine(departure_day, departure.time)
-            # Add timezone infomation. pytz will handle DST correctly
-            departure_dt = LONDON.localize(departure_dt)
-
-            # Get departure JSON dict and replace the time object with the datetime object.
-            departure = departure.to_JSON()
-            departure['time'] = departure_dt
-
-            bus = departure
+            bus = {'departure': bus[0].to_JSON(), 'days_future': int(bus[1])}
 
         mc.set(mc_key, bus)
+
+    if bus:
+        departure = bus['departure']
+        # Create a day delta, is this departure time today or tomorrow?
+        day_delta = datetime.timedelta(days = bus['days_future'])
+        departure_day = datetime.date.today() + day_delta
+
+        departure_dt = datetime.datetime.combine(departure_day, departure['time'])
+        # Add timezone infomation. pytz will handle DST correctly
+        departure_dt = LONDON.localize(departure_dt)
+
+        departure['time'] = departure_dt
+
+        bus = departure
 
     return bus
 
