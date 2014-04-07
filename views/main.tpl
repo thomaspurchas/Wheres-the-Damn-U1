@@ -201,7 +201,6 @@
     function success_callback(p) {
         // p.latitude : latitude value
         // p.longitude : longitude value
-        updateButton.contents().last()[0].textContent=' Getting Bus Info';
 
         coords = p.coords;
         locElmt.innerHTML = Math.round(coords.latitude*10000)/10000 + ", " +
@@ -223,7 +222,24 @@
         userCoords = coords;
         placeUserMarker();
 
+        getBusData(coords);
+
+    }
+
+    function error_callback(p){
+        // p.message : error message
+        locElmt.innerHTML = "Damn, can't get your location. Sorry :(";
+        updateButton.prop('disabled', false);
+        updateButton.find('.fa-compass').removeClass('fa-spin');
+        updateButton.contents().last()[0].textContent=' Update Bus Info';
+    }
+
+    function getBusData(coords) {
+        if (!coords) return;
         var update_moment = new moment();
+
+        updateButton.contents().last()[0].textContent=' Getting Bus Info';
+        $(updateButton).prop('disabled', true);
 
         $.getJSON("/nearest", {
             lat: coords.latitude,
@@ -273,14 +289,6 @@
                 $('#updateError').show();
             }
           });
-    }
-
-    function error_callback(p){
-        // p.message : error message
-        locElmt.innerHTML = "Damn, can't get your location. Sorry :(";
-        updateButton.prop('disabled', false);
-        updateButton.find('.fa-compass').removeClass('fa-spin');
-        updateButton.contents().last()[0].textContent=' Update Bus Info';
     }
 
     function placeUserMarker() {
@@ -370,7 +378,7 @@
                 $('#bus').text('...');
                 $('#busTime').text('');
                 $('#bus').removeClass('text-danger');
-                $('#updateButton').click();
+                getBusData(userCoords);
                 nextBus = null;
             }
         }
