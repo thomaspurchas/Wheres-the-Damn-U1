@@ -155,6 +155,14 @@
             locElmt.innerHTML = "Damn, can't get your location. Sorry :(";
         }
 
+        if (Modernizr.localstorage) {
+            nextBus = moment(localStorage.getItem("nextBus"));
+            lastUpdate = moment(localStorage.getItem("lastUpate"));
+            busStop = localStorage.getItem("busStop");
+            if (busStop && nextBus.isAfter()) {
+                nearestElmt.innerHTML = busStop;
+            }
+        }
 
         updateTimers(); // Get the ball rolling
     }
@@ -196,14 +204,25 @@
             lastUpdate = update_moment;
             updateTimers();
 
+            if (Modernizr.localstorage) {
+                localStorage.setItem("lastUpdate", lastUpdate);
+            }
+
             nearestElmt.innerHTML = data.stop.name + ", ~" +
                 Math.round(data.stop.distance) + "m away";
+
+            if (Modernizr.localstorage) {
+                localStorage.setItem("busStop", nearestElmt.innerHTML);
+            }
 
             stopCoords = data.stop.location;
             placeStopMarker();
 
             if (data.next_bus != null){
                 nextBus = moment(data.next_bus.time);
+                if (Modernizr.localstorage) {
+                    localStorage.setItem("nextBus", nextBus);
+                }
                 updateTimers();
                 $('.routeNumber').text(data.next_bus.route_number);
             }else{
