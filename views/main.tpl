@@ -354,7 +354,7 @@
         }
 
         if (nextBus) {
-            if (nextBus.isAfter()) {
+            if (nextBus.isAfter(moment().subtract('s', 40))) {
                 $('#bus').text(nextBus.fromNow());
                 $('#busTime').text(nextBus.format(' (HH:mm)'));
                 if (moment().add('m', 5).isAfter(nextBus)) {
@@ -362,6 +362,9 @@
                     $('#bus').addClass('text-danger');
                 } else {
                     $('#bus').removeClass('text-danger');
+                }
+                if (moment().isAfter(nextBus)) {
+                    $('#bus').text('now');
                 }
             } else {
                 $('#bus').text('...');
