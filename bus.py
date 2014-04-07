@@ -303,24 +303,38 @@ def get_next_bus(mc, db, stop_id):
 
     bus = mc.get(mc_key)
     if not bus:
-        today_query = db.query(DepartureTimeDeref, literal_column("0").label("query_order")).\
+        today_query = db.query(DepartureTimeDeref, literal_column("0").label("days_future")).\
                                       filter_by(bus_stop_id=stop_id).\
                                       filter(DepartureTimeDeref.time >= now_time).\
                                       filter(DepartureTimeDeref.valid_days.contains(cast([DAYS[now_day]], postgresql.ARRAY(String))))
 
-        tomorrow_query = db.query(DepartureTimeDeref, literal_column("1").label("query_order")).\
+        tomorrow_query = db.query(DepartureTimeDeref, literal_column("1").label("days_future")).\
                                       filter_by(bus_stop_id=stop_id).\
                                       filter(DepartureTimeDeref.valid_days.contains(cast([DAYS[now_day + 1]], postgresql.ARRAY(String))))
 
 
         bus = today_query.union_all(tomorrow_query).\
                             options(joinedload(DepartureTimeDeref.timetable, Timetable.route)).\
-                            order_by("query_order").\
+                            order_by("days_future").\
                             order_by(DepartureTimeDeref.time).\
                             first()
 
         if bus:
-            bus = bus[0].to_JSON() #We only want the departure time object, not the virtual query_order column
+            departure = bus[0]
+
+            # Create a day delta, is this departure time today or tomorrow?
+            day_delta = datetime.timedelta(days = int(bus[1]))
+            departure_day = datetime.date.today() + day_delta
+
+            departure_dt = datetime.datetime.combine(departure_day, departure.time)
+            # Add timezone infomation. pytz will handle DST correctly
+            departure_dt = LONDON.localize(departure_dt)
+
+            # Get departure JSON dict and replace the time object with the datetime object.
+            departure = departure.to_JSON()
+            departure['time'] = departure_dt
+
+            bus = departure
 
         mc.set(mc_key, bus)
 
