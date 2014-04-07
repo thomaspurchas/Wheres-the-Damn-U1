@@ -54,6 +54,9 @@
         width: 100%;
         display: none;
     }
+    #bus {
+        font-weight: bold;
+    }
     </style>
 </head>
 <body>
@@ -70,7 +73,7 @@
 
 <p>Your nearest <span class="routeNumber">U1</span> bus stop is: <span id="nearest">...</span></p>
 
-<p>and the next bus is: <span id="bus">...</span></p>
+<p>and the next bus is <span id="bus">...</span></p>
 
 <p>
     <div id="map-canvas"></div>
@@ -324,6 +327,12 @@
         if (nextBus) {
             if (nextBus.isAfter()) {
                 $('#bus').text(nextBus.fromNow());
+                if (moment().add('m', 5).isAfter(nextBus)) {
+                    // If bus is in 5 mins turn text red
+                    $('#bus').addClass('text-danger');
+                } else {
+                    $('#bus').removeClass('text-danger');
+                }
             } else {
                 $('#bus').text('...');
                 // $('#updateButton').click();
