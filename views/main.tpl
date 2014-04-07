@@ -9,7 +9,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
     <script src="/static/geoPosition.js" type="text/javascript" charset="utf-8"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/datejs/1.0/date.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.5.1/moment-with-langs.js"></script>
 
     <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
     <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
@@ -35,7 +35,7 @@
     #loc, #nearest {
         white-space: nowrap;
     }
-    #lastUpdate {
+    .grey {
         color: #b9b9b9;
     }
     #updateError {
@@ -53,8 +53,6 @@
         width: 100%;
         display: none;
     }
-    </style>
-
     </style>
 </head>
 <body>
@@ -93,15 +91,18 @@
         <i class="fa fa-compass fa-spin"></i>
         Getting Location
     </button>
-    <small id="lastUpdate">Last Update: Never</small>
+    <small class="grey">Last Update: <span id="lastUpdate">Never<span></small>
 </p>
 
 <script type="text/javascript">
     var locElmt = document.getElementById("loc");
     var nearestElmt = document.getElementById("nearest");
     var busElmt = document.getElementById("bus");
-    var updateElmt = document.getElementById("lastUpdate");
     var updateButton = $('#updateButton');
+    var lastUpdate = null;
+    var nextBus = null;
+    var updateTimeout = null;
+    var updateInterval = 45000;
     var watch = null;
     var userMarker = null;
     var busMarker = null;
@@ -152,6 +153,9 @@
                 // You cannot use Geolocation in this device
             locElmt.innerHTML = "Damn, can't get your location. Sorry :(";
         }
+
+        // Update the timers every 45 seconds (this is the smallest human interval for moment)
+        updateTimeout = window.setTimeout(updateTimers, updateInterval);
     }
 
     // p : geolocation object
@@ -180,16 +184,16 @@
         userCoords = coords;
         placeUserMarker();
 
-        var currentdate = new Date();
-        var update_datetime = "Last Update: "
-            + currentdate.toString("HH:mm:ss");
+        var update_moment = new moment();
+
         $.getJSON("/nearest", {
             lat: coords.latitude,
             lon: coords.longitude
         })
           .done(function(data){
             $('#updateError').hide();
-            lastUpdate.innerHTML = update_datetime;
+            lastUpdate = update_moment;
+            updateTimers();
 
             nearestElmt.innerHTML = data.stop.name + ", ~" +
                 Math.round(data.stop.distance) + "m away";
@@ -198,7 +202,8 @@
             placeStopMarker();
 
             if (data.next_bus != null){
-                busElmt.innerHTML = Date.parse(data.next_bus.time).toString("HH:mm")
+                nextBus = moment(data.next_bus.time);
+                updateTimers();
                 $('.routeNumber').text(data.next_bus.route_number);
             }else{
                 busElmt.innerHTML = "Sorry, that data is not avaliable at the moment :(";
@@ -288,6 +293,25 @@
             var bounds = new google.maps.LatLngBounds(googBusLatLon, googUserLatLon);
             map.fitBounds(bounds);
         }
+    }
+
+    function updateTimers() {
+        console.log("Update timers");
+        if (lastUpdate) {
+            $('#lastUpdate').text(lastUpdate.fromNow());
+        }
+
+        if (nextBus) {
+            if (nextBus.isAfter()) {
+                $('#bus').text(nextBus.fromNow());
+            } else {
+                $('#bus').text('...');
+                // $('#updateButton').click();
+            }
+        }
+
+        clearTimeout(updateTimeout);
+        updateTimeout = window.setTimeout(updateTimers, updateInterval);
     }
 
     function initializeMap() {
