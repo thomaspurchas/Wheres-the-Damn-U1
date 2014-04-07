@@ -9,6 +9,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
     <script src="/static/geoPosition.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/static/modernizr.js" type="text/javascript"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.5.1/moment-with-langs.js"></script>
 
     <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
@@ -102,7 +103,7 @@
     var lastUpdate = null;
     var nextBus = null;
     var updateTimeout = null;
-    var updateInterval = 45000;
+    var updateInterval = 45000; // Update the timers every 45 seconds (this is the smallest human interval for moment)
     var watch = null;
     var userMarker = null;
     var busMarker = null;
@@ -154,8 +155,8 @@
             locElmt.innerHTML = "Damn, can't get your location. Sorry :(";
         }
 
-        // Update the timers every 45 seconds (this is the smallest human interval for moment)
-        updateTimeout = window.setTimeout(updateTimers, updateInterval);
+
+        updateTimers(); // Get the ball rolling
     }
 
     // p : geolocation object
