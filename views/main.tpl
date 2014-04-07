@@ -21,10 +21,15 @@
     body {
         position: relative;
         padding: 5px;
-        max-width: 510px;
+        max-width: 520px;
         min-height: 100%;
         margin: auto;
-        box-shadow: 0 0 20px 1px #905050;
+    }
+    @media (min-width: 520px) {
+        body {
+            box-shadow: 0 0 20px 1px #905050;
+            max-width: 510px;
+        }
     }
     body:after {
         content: '';
@@ -74,7 +79,6 @@
     }
     #map-canvas {
         height: 200px;
-        max-width: 500px;
         width: 100%;
         display: none;
     }
