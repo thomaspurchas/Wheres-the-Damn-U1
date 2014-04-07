@@ -16,14 +16,15 @@
     <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
     <style>
     html {
-        width: 100%;
         height: 100%;
     }
     body {
+        position: relative;
         padding: 5px;
         max-width: 510px;
-        height: 100%;
+        min-height: 100%;
         margin: auto;
+        box-shadow: 0 0 20px 1px #905050;
     }
     body:after {
         content: '';
@@ -52,7 +53,7 @@
     .btn-default:focus {
         background-color: white;
     }
-    .update *{
+    .update > *{
         display: inline-block;
         vertical-align: top;
     }
