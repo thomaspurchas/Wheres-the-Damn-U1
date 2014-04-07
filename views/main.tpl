@@ -96,7 +96,7 @@
 
 <p>Your nearest <span class="routeNumber">U1</span> bus stop is: <span id="nearest">...</span></p>
 
-<p>and the next bus is <span id="bus">...</span></p>
+<p>and the next bus is <span id="bus">...</span><small class="grey" id="busTime"></small></p>
 
 <p>
     <div id="map-canvas"></div>
@@ -352,6 +352,7 @@
         if (nextBus) {
             if (nextBus.isAfter()) {
                 $('#bus').text(nextBus.fromNow());
+                $('#busTime').text(nextBus.format(' (HH:mm)'));
                 if (moment().add('m', 5).isAfter(nextBus)) {
                     // If bus is in 5 mins turn text red
                     $('#bus').addClass('text-danger');
@@ -360,6 +361,8 @@
                 }
             } else {
                 $('#bus').text('...');
+                $('#busTime').text('');
+                $('#bus').removeClass('text-danger');
                 // $('#updateButton').click();
             }
         }
