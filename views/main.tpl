@@ -325,7 +325,6 @@
     }
 
     function updateTimers() {
-        console.log("Update timers");
         if (lastUpdate) {
             $('#lastUpdate').text(lastUpdate.fromNow());
         }
