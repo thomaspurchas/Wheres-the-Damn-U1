@@ -128,7 +128,7 @@
     var lastUpdate = null;
     var nextBus = null;
     var updateTimeout = null;
-    var updateInterval = 45000; // Update the timers every 45 seconds (this is the smallest human interval for moment)
+    var updateInterval = 20000; // Update the timers every 20 seconds
     var watch = null;
     var userMarker = null;
     var busMarker = null;
