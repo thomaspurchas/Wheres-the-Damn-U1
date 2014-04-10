@@ -2,7 +2,7 @@
 
 from bottle import route, request, run, template, install, static_file
 from bottle.ext import sqlalchemy
-from sqlalchemy import create_engine, Column, Integer, Sequence, String, ForeignKey, Date, Time, UniqueConstraint, Boolean, cast, literal_column
+from sqlalchemy import create_engine, Column, Integer, Sequence, String, ForeignKey, Date, Time, UniqueConstraint, Boolean, cast, literal_column, func
 from sqlalchemy.orm import relationship, backref, joinedload
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
@@ -53,6 +53,7 @@ class BusStop(Base):
     id = Column(Integer, Sequence('busstops_id_seq'), primary_key=True)
     name = Column(String(50), nullable=False)
     location = Column(Geography('POINT', srid=4326), nullable=False)
+    weighting = Column(Integer, nullable=False, default=0)
 
     def __init__(self, name):
         self.name = name
@@ -345,15 +346,19 @@ def getnearestsop(db, mc):
     location = (float(request.query.decode()['lon']), float(request.query.decode()['lat']))
     location = 'POINT({:.4f} {:.5f})'.format(*location)
 
-    stop = mc.get("USERLOC:" + location)
+    key = "V2:USERLOC:" + location
+
+    stop = mc.get(key)
     if not stop:
         stop = db.query(BusStop.id,
                          BusStop.name,
                          BusStop.location.ST_AsGeoJSON().label('geo'),
-                         BusStop.location.ST_Distance(location).label('distance')
-                         ).order_by('distance').first()
+                         BusStop.location.ST_Distance(location).label('distance'),
+                         (BusStop.weighting + BusStop.location.ST_Distance(location)).\
+                            label('distance_weighted')
+                         ).order_by('distance_weighted').first()
 
-        mc.set("USERLOC:" + location, stop)
+        mc.set(key, stop)
 
     # Quick botch to use the Gate house times for engineering
     stop_id = 8 if stop.id == 9 else stop.id
