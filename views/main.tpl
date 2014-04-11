@@ -150,6 +150,7 @@
                 $(this).find('.fa-compass').addClass('fa-spin')
                 $(this).contents().last()[0].textContent=' Getting Location';
                 if(navigator.geolocation){
+                    navigator.geolocation.clearWatch(watch);
                     watch = navigator.geolocation.watchPosition(success_callback,error_callback,{enableHighAccuracy:true});
                     watchTimeout = window.setTimeout(cancelGeoWatch, 5000);
                 }else{
