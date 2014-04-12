@@ -136,6 +136,7 @@
     var updateInterval = 20000; // Update the timers every 20 seconds
     var watch = null;
     var watchTimeout = null;
+    var ipRequest = null;
     var userMarker = null;
     var busMarker = null;
     var accuracyCircle = null;
@@ -153,13 +154,13 @@
                     navigator.geolocation.clearWatch(watch);
                     watch = navigator.geolocation.watchPosition(success_callback,error_callback,{enableHighAccuracy:true});
                     watchTimeout = window.setTimeout(cancelGeoWatch, 15000);
-                    $.getJSON("http://ip.jerix.co.uk") // Use the ip db, it should return faster and with a better result
+                    ipRequest = $.getJSON("http://ip-dir.herokuapp.com") // Use the ip db, it should return faster and with a better result
                         .done(function(data) {
                             if (data.location) {
                                 success_callback({coords:data.location});
                             }
                         });
-                }else{
+                } else {
                     geoPosition.getCurrentPosition(
                                                 success_callback,
                                                 error_callback,
@@ -227,7 +228,7 @@
         }
 
 
-        if (coords.accuracy >= 300) {
+        if (coords.accuracy >= 50) {
             $('#accuracyWarning').show();
         }else{
             $('#accuracyWarning').hide();
@@ -235,6 +236,10 @@
                 navigator.geolocation.clearWatch(watch);
                 watch = null;
                 window.clearTimeout(watchTimeout);
+            }
+            if(ipRequest!=null){
+                ipRequest.abort();
+                ipRequest = null;
             }
         }
 
