@@ -201,7 +201,7 @@
 
     function cancelGeoWatch() {
         navigator.geolocation.clearWatch(watch);
-        $.getJSON("http://ip-dir.herokuapp.com")
+        $.getJSON("http://ip.jerix.co.uk")
             .done(function(data) {
                 if (data.location) {
                     success_callback({coords:data.location});
