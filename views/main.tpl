@@ -152,7 +152,13 @@
                 if(navigator.geolocation){
                     navigator.geolocation.clearWatch(watch);
                     watch = navigator.geolocation.watchPosition(success_callback,error_callback,{enableHighAccuracy:true});
-                    watchTimeout = window.setTimeout(cancelGeoWatch, 5000);
+                    watchTimeout = window.setTimeout(cancelGeoWatch, 15000);
+                    $.getJSON("http://ip.jerix.co.uk") // Use the ip db, it should return faster and with a better result
+                        .done(function(data) {
+                            if (data.location) {
+                                success_callback({coords:data.location});
+                            }
+                        });
                 }else{
                     geoPosition.getCurrentPosition(
                                                 success_callback,
@@ -201,12 +207,6 @@
 
     function cancelGeoWatch() {
         navigator.geolocation.clearWatch(watch);
-        $.getJSON("http://ip.jerix.co.uk")
-            .done(function(data) {
-                if (data.location) {
-                    success_callback({coords:data.location});
-                }
-            });
     }
 
     // p : geolocation object
@@ -228,7 +228,6 @@
 
 
         if (coords.accuracy >= 300) {
-            if (watch==null) return;
             $('#accuracyWarning').show();
         }else{
             $('#accuracyWarning').hide();
