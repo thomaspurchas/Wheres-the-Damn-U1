@@ -201,15 +201,10 @@
 
     function cancelGeoWatch() {
         navigator.geolocation.clearWatch(watch);
-        $.getJSON("http://ip.jerix.co.uk")
+        $.getJSON("http://ip-dir.herokuapp.com")
             .done(function(data) {
-                if (data.campus) {
-                    var coords = {
-                        longitude: -1.562044,
-                        latitude: 52.382412,
-                        accuracy: 50
-                    }
-                    success_callback({coords:coords});
+                if (data.location) {
+                    success_callback({coords:data.location});
                 }
             });
     }
@@ -220,10 +215,17 @@
         // p.longitude : longitude value
 
         coords = p.coords;
-        locElmt.innerHTML = Math.round(coords.latitude*10000)/10000 + ", " +
-            Math.round(coords.longitude*10000)/10000 +
-            "<br/>Location Accuracy is " +
-            Math.round(coords.accuracy) + "m";
+        if (coords.name) {
+            locElmt.innerHTML = coords.name +
+                "<br/>Location Accuracy is " +
+                Math.round(coords.accuracy) + "m";
+        } else {
+            locElmt.innerHTML = Math.round(coords.latitude*10000)/10000 + ", " +
+                Math.round(coords.longitude*10000)/10000 +
+                "<br/>Location Accuracy is " +
+                Math.round(coords.accuracy) + "m";
+        }
+
 
         if (coords.accuracy >= 300) {
             if (watch==null) return;
