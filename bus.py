@@ -360,8 +360,7 @@ def getnearestsop(db, mc):
 
         mc.set(key, stop)
 
-    # Quick botch to use the Gate house times for engineering
-    stop_id = 8 if stop.id == 9 else stop.id
+    stop_id = stop.id
 
     bus = get_next_bus(mc, db, stop_id)
 
