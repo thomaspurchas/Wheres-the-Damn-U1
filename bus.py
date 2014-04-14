@@ -300,7 +300,7 @@ def get_next_bus(mc, db, stop_id):
     now_day = now_time.weekday()
     now_time = now_time.time()
 
-    mc_key = "V3:USERSTOP:" +  str(stop_id) + "USERTIME:" + now_time.strftime("%w%H%M")
+    mc_key = "V4:USERSTOP:" +  str(stop_id) + "USERTIME:" + now_time.strftime("%w%H%M")
 
     bus = mc.get(mc_key)
     if not bus:
@@ -342,7 +342,7 @@ def get_next_bus(mc, db, stop_id):
     return bus
 
 @route('/nearest')
-def getnearestsop(db, mc):
+def getneareststop(db, mc):
     location = (float(request.query.decode()['lon']), float(request.query.decode()['lat']))
     location = 'POINT({:.4f} {:.5f})'.format(*location)
 
