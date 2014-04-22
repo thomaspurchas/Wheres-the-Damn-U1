@@ -295,23 +295,28 @@ def getstops(db):
 
 
 def get_next_bus(mc, db, stop_id):
-    now_time = datetime.datetime.utcnow().replace(tzinfo=UTC)
-    now_time = LONDON.normalize(now_time.astimezone(LONDON))
-    now_day = now_time.weekday()
-    now_time = now_time.time()
+    now_datetime = datetime.datetime.utcnow().replace(tzinfo=UTC)
+    now_datetime = LONDON.normalize(now_datetime.astimezone(LONDON))
+    now_day = now_datetime.weekday()
+    now_time = now_datetime.time()
 
-    mc_key = "V4:USERSTOP:" +  str(stop_id) + "USERTIME:" + now_time.strftime("%w%H%M")
+    mc_key = "V5:USERSTOP:" +  str(stop_id) + "USERTIME:" + now_time.strftime("%w%H%M")
 
     bus = mc.get(mc_key)
     if not bus:
         today_query = db.query(DepartureTimeDeref, literal_column("0").label("days_future")).\
                                       filter_by(bus_stop_id=stop_id).\
                                       filter(DepartureTimeDeref.time >= now_time).\
-                                      filter(DepartureTimeDeref.valid_days.contains(cast([DAYS[now_day]], postgresql.ARRAY(String))))
+                                      filter(DepartureTimeDeref.valid_days.contains(cast([DAYS[now_day]], postgresql.ARRAY(String)))).\
+                                      filter(Timetable.valid_from <= now_datetime.date()).\
+                                      filter(Timetable.valid_to >= now_datetime.date())
 
+        single_day_delta = datetime.timedelta(days=1)
         tomorrow_query = db.query(DepartureTimeDeref, literal_column("1").label("days_future")).\
                                       filter_by(bus_stop_id=stop_id).\
-                                      filter(DepartureTimeDeref.valid_days.contains(cast([DAYS[now_day + 1]], postgresql.ARRAY(String))))
+                                      filter(DepartureTimeDeref.valid_days.contains(cast([DAYS[now_day + 1]], postgresql.ARRAY(String)))).\
+                                      filter(Timetable.valid_from <= now_datetime.date() + single_day_delta).\
+                                      filter(Timetable.valid_to >= now_datetime.date() + single_day_delta)
 
 
         bus = today_query.union_all(tomorrow_query).\
@@ -329,7 +334,7 @@ def get_next_bus(mc, db, stop_id):
         departure = bus['departure']
         # Create a day delta, is this departure time today or tomorrow?
         day_delta = datetime.timedelta(days = bus['days_future'])
-        departure_day = datetime.date.today() + day_delta
+        departure_day = now_datetime.date() + day_delta
 
         departure_dt = datetime.datetime.combine(departure_day, departure['time'])
         # Add timezone infomation. pytz will handle DST correctly
