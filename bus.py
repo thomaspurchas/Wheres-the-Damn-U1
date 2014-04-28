@@ -300,7 +300,7 @@ def get_next_bus(mc, db, stop_id):
     now_day = now_datetime.weekday()
     now_time = now_datetime.time()
 
-    mc_key = "V5:USERSTOP:" +  str(stop_id) + "USERTIME:" + now_time.strftime("%w%H%M")
+    mc_key = "V6:USERSTOP:" +  str(stop_id) + "USERTIME:" + now_time.strftime("%w%H%M")
 
     bus = mc.get(mc_key)
     if not bus:
@@ -308,6 +308,7 @@ def get_next_bus(mc, db, stop_id):
                                       filter_by(bus_stop_id=stop_id).\
                                       filter(DepartureTimeDeref.time >= now_time).\
                                       filter(DepartureTimeDeref.valid_days.contains(cast([DAYS[now_day]], postgresql.ARRAY(String)))).\
+                                      join(DepartureTimeDeref.timetable).\
                                       filter(Timetable.valid_from <= now_datetime.date()).\
                                       filter(Timetable.valid_to >= now_datetime.date())
 
@@ -315,6 +316,7 @@ def get_next_bus(mc, db, stop_id):
         tomorrow_query = db.query(DepartureTimeDeref, literal_column("1").label("days_future")).\
                                       filter_by(bus_stop_id=stop_id).\
                                       filter(DepartureTimeDeref.valid_days.contains(cast([DAYS[now_day + 1]], postgresql.ARRAY(String)))).\
+                                      join(DepartureTimeDeref.timetable).\
                                       filter(Timetable.valid_from <= now_datetime.date() + single_day_delta).\
                                       filter(Timetable.valid_to >= now_datetime.date() + single_day_delta)
 
