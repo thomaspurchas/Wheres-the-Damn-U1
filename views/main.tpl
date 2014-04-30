@@ -27,7 +27,7 @@
     }
     @media (min-width: 520px) {
         body {
-            box-shadow: 0 0 20px 1px #905050;
+            box-shadow: 0 0 20px 1px #505050;
             max-width: 510px;
         }
     }
