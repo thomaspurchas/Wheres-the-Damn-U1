@@ -82,7 +82,7 @@
         width: 100%;
         display: none;
     }
-    #bus {
+    #bus, #busDest {
         font-weight: bold;
     }
     </style>
@@ -100,7 +100,7 @@
 
 <p>Your nearest <span class="routeNumber">U1</span> bus stop is: <span id="nearest">...</span></p>
 
-<p>and the next bus is <span id="bus">...</span><small class="grey" id="busTime"></small></p>
+<p>and the next bus is <span id="bus">...</span><small class="grey" id="busTime"></small> going to <span id="busDest">...</span></p>
 
 <p>
     <div id="map-canvas"></div>
@@ -132,6 +132,7 @@
     var updateButton = $('#updateButton');
     var lastUpdate = null;
     var nextBus = null;
+    var nextBusDest = null;
     var updateTimeout = null;
     var updateInterval = 20000; // Update the timers every 20 seconds
     var watch = null;
@@ -196,6 +197,7 @@
 
         if (Modernizr.localstorage) {
             nextBus = moment(localStorage.getItem("nextBus"));
+            nextBusDest = localStorage.getItem("nextBusDest");
             lastUpdate = moment(localStorage.getItem("lastUpate"));
             busStop = localStorage.getItem("busStop");
             if (busStop && nextBus.isAfter()) {
@@ -290,8 +292,10 @@
 
             if (data.next_bus != null){
                 nextBus = moment(data.next_bus.time);
+                nextBusDest = data.next_bus.destination;
                 if (Modernizr.localstorage) {
                     localStorage.setItem("nextBus", nextBus);
+                    localStorage.setItem("nextBusDest", nextBusDest);
                 }
                 updateTimers();
                 $('.routeNumber').text(data.next_bus.route_number);
@@ -389,6 +393,7 @@
             if (nextBus.isAfter(moment().subtract('s', 40))) {
                 $('#bus').text(nextBus.fromNow());
                 $('#busTime').text(nextBus.format(' (HH:mm)'));
+                $('#busDest').text(nextBusDest);
                 if (moment().add('m', 5).isAfter(nextBus)) {
                     // If bus is in 5 mins turn text red
                     $('#bus').addClass('text-danger');
@@ -401,9 +406,11 @@
             } else {
                 $('#bus').text('...');
                 $('#busTime').text('');
+                $('#busDest').text('...');
                 $('#bus').removeClass('text-danger');
                 getBusData(userCoords);
                 nextBus = null;
+                nextBusDest = null;
             }
         }
 
