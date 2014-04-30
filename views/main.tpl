@@ -408,7 +408,8 @@
         }
 
         clearTimeout(updateTimeout);
-        updateTimeout = window.setTimeout(updateTimers, updateInterval);
+        var timeTillMin = 1100 - moment().milliseconds();
+        updateTimeout = window.setTimeout(updateTimers, Math.min(updateInterval, timeTillMin));
     }
 
     function initializeMap() {
