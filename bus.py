@@ -64,6 +64,12 @@ class BusStop(Base):
     def __str__(self):
         return "BusStop('%s', '%s', '%s')" % (self.id, self.name, self.location)
 
+    def to_JSON(self):
+        return {
+            'id': self.id,
+            'name': self.name
+        }
+
 
 class Timetable(Base):
     __tablename__ = "Timetables"
@@ -112,16 +118,32 @@ class DepartureTimeBase(Base):
             'timetable': self.timetable_id,
             'route_number': self.timetable.route.number,
             'destination': self.destination,
-            'time': self.time,
+            'time': getattr(self, 'local_time', self.time),
             'valid_days': self.valid_days,
             'guessed': False
         }
+
+    def localise_time(self):
+        now_datetime = datetime.datetime.utcnow().replace(tzinfo=UTC)
+        now_datetime = LONDON.normalize(now_datetime.astimezone(LONDON))
+        # Create a day delta, is this departure time today or tomorrow?
+        departure_day = now_datetime.date()
+
+        departure_dt = datetime.datetime.combine(departure_day, self.time)
+        # Add timezone infomation. pytz will handle DST correctly
+        departure_dt = LONDON.localize(departure_dt)
+
+        self.local_time = departure_dt
+
+        return self
+
 
 class DepartureTime(DepartureTimeBase):
     __tablename__ = "Departures"
 
     timetable = relationship("Timetable", backref='departure_times', lazy='joined')
     bus_stop = relationship("BusStop", backref='departure_times')
+
 
 class DepartureTimeDeref(DepartureTimeBase):
     # Uses the defereneced departures table to deal with time deltas.
@@ -380,6 +402,29 @@ def getneareststop(db, mc):
                 },
             'next_bus': bus
             }
+
+@route('/stop/<stop_id:int>/next_departures')
+def get_stop_next_departures(stop_id, mc, db):
+    now_datetime = datetime.datetime.utcnow().replace(tzinfo=UTC)
+    now_datetime = LONDON.normalize(now_datetime.astimezone(LONDON))
+    now_time = now_datetime.time()
+
+    stop = db.query(BusStop).get(stop_id)
+
+    departures = db.query(DepartureTimeDeref).filter_by(bus_stop_id=stop_id).\
+                                              filter(DepartureTimeDeref.time >= now_time).\
+                                              join(DepartureTimeDeref.timetable).\
+                                              filter(Timetable.valid_from <= now_datetime.date()).\
+                                              filter(Timetable.valid_to >= now_datetime.date()).\
+                                              order_by(DepartureTimeDeref.time).\
+                                              limit(10)
+
+    departures_json = [departure.localise_time().to_JSON() for departure in departures]
+
+    return {
+        'stop': stop.to_JSON(),
+        'departures': departures_json
+    }
 
 @route('/next_bus')
 def api_get_next_bus(mc, db):

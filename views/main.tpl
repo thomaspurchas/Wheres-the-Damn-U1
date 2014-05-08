@@ -102,6 +102,8 @@
 
 <p>and the next bus is <span id="bus">...</span><small class="grey" id="busTime"></small> going to <span id="busDest">...</span></p>
 
+<p>there is another bus <span id="altBus">...</span><small class="grey" id="altBusTime"></small> going to <span id="altBusDest">...</span></p>
+
 <p>
     <div id="map-canvas"></div>
 </p>
@@ -133,6 +135,8 @@
     var lastUpdate = null;
     var nextBus = null;
     var nextBusDest = null;
+    var altBus = null;
+    var altBusDest = null;
     var updateTimeout = null;
     var updateInterval = 20000; // Update the timers every 20 seconds
     var watch = null;
@@ -303,6 +307,17 @@
                 busElmt.innerHTML = "Sorry, that data is not avaliable at the moment :(";
             }
 
+            if (data.stop != null){
+                $.getJSON("/stop/" + data.stop.id + "/next_departures")
+                    .done(function(data) {
+                        if (data.departures != null){
+                            altBus = moment(data.departures[1].time);
+                            altBusDest = data.departures[1].destination;
+                            updateTimers();
+                        }
+                    });
+            }
+
             updateButton.prop('disabled', false);
             updateButton.find('.fa-compass').removeClass('fa-spin');
             updateButton.contents().last()[0].textContent=' Update Bus Info';
@@ -411,6 +426,20 @@
                 getBusData(userCoords);
                 nextBus = null;
                 nextBusDest = null;
+            }
+        }
+
+        if (altBus) {
+            if (altBus.isAfter(moment().subtract('s', 40))) {
+                $('#altBus').text(altBus.fromNow());
+                $('#altBusTime').text(altBus.format(' (HH:mm)'));
+                $('#altBusDest').text(altBusDest);
+            } else {
+                $('#altBus').text('...');
+                $('#altBusTime').text('');
+                $('#altBusDest').text('...');
+                altBus = null;
+                altBusDest = null;
             }
         }
 
