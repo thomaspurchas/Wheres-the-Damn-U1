@@ -234,7 +234,7 @@
         }
 
 
-        if (coords.accuracy >= 50) {
+        if (coords.accuracy > 65) {
             $('#accuracyWarning').show();
         }else{
             $('#accuracyWarning').hide();
