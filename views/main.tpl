@@ -452,7 +452,9 @@
         var mapOptions = {
           center: new google.maps.LatLng(52.287373, -1.548609),
           zoom: 12,
-          streetViewControl: false
+          // streetViewControl: false
+          disableDefaultUI: true,
+          draggable: false
         };
         map = new google.maps.Map(document.getElementById("map-canvas"),
             mapOptions);
