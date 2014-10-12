@@ -54,6 +54,8 @@ class BusStop(Base):
     name = Column(String(50), nullable=False)
     location = Column(Geography('POINT', srid=4326), nullable=False)
     weighting = Column(Integer, nullable=False, default=0)
+    valid_days = Column(postgresql.ARRAY(String), nullable=False)
+
 
     def __init__(self, name):
         self.name = name
@@ -357,7 +359,7 @@ def get_next_bus(mc, db, stop_id):
     if bus:
         departure = bus['departure']
         # Create a day delta, is this departure time today or tomorrow?
-        day_delta = datetime.timedelta(days = bus['days_future'])
+        day_delta = datetime.timedelta(days=bus['days_future'])
         departure_day = now_datetime.date() + day_delta
 
         departure_dt = datetime.datetime.combine(departure_day, departure['time'])
@@ -375,6 +377,10 @@ def getneareststop(db, mc):
     location = (float(request.query.decode()['lon']), float(request.query.decode()['lat']))
     location = 'POINT({:.4f} {:.5f})'.format(*location)
 
+    now_datetime = datetime.datetime.utcnow().replace(tzinfo=UTC)
+    now_datetime = LONDON.normalize(now_datetime.astimezone(LONDON))
+    now_day = now_datetime.weekday()
+
     key = "V2:USERLOC:" + location
 
     stop = mc.get(key)
@@ -385,7 +391,9 @@ def getneareststop(db, mc):
                          BusStop.location.ST_Distance(location).label('distance'),
                          (BusStop.weighting + BusStop.location.ST_Distance(location)).\
                             label('distance_weighted')
-                         ).order_by('distance_weighted').first()
+                         ).\
+                         filter(BusStop.valid_days.contains(cast([DAYS[now_day]], postgresql.ARRAY(String)))).\
+                         order_by('distance_weighted').first()
 
         mc.set(key, stop)
 
