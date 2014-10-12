@@ -4,11 +4,12 @@
     <title>WTHTU1</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
     <meta name="mobile-web-app-capable" content="yes">
-    <link rel="apple-touch-icon" href="apple-touch-icon.png">
-    <link rel="apple-touch-icon" sizes="76x76" href="apple-touch-icon-76x76.png">
-    <link rel="apple-touch-icon" sizes="120x120" href="apple-touch-icon-120x120.png">
-    <link rel="apple-touch-icon" sizes="152x152" href="apple-touch-icon-152x152.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon-180x180.png">
+    <link rel="icon" type="image/png" href="/static/icon-32x32.png" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+    <link rel="apple-touch-icon" sizes="76x76" href="/static/apple-touch-icon-76x76.png" />
+    <link rel="apple-touch-icon" sizes="120x120" href="/static/apple-touch-icon-120x120.png" />
+    <link rel="apple-touch-icon" sizes="152x152" href="/static/apple-touch-icon-152x152.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon-180x180.png" />
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
