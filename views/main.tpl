@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html manifest="/static/bus.appcache">
 <head>
-    <title>WTHTU1</title>
+    <title>WTHTU1 - Where the Hell's the U1?</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
     <meta name="mobile-web-app-capable" content="yes">
     <link rel="icon" type="image/png" href="/static/icon-32x32.png" />
