@@ -3,15 +3,16 @@
 <head>
     <title>WTHTU1 - Where the Hell's the U1?</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
-    <meta name="mobile-web-app-capable" content="yes">
-    <link rel="icon" type="image/png" href="/static/icon-32x32.png" />
-    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
-    <link rel="apple-touch-icon" sizes="76x76" href="/static/apple-touch-icon-76x76.png" />
-    <link rel="apple-touch-icon" sizes="120x120" href="/static/apple-touch-icon-120x120.png" />
-    <link rel="apple-touch-icon" sizes="152x152" href="/static/apple-touch-icon-152x152.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon-180x180.png" />
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="WTHTU1">
+    <link rel="manifest" href="/static/android-manifest.json">
+    <link rel="icon" type="image/png" href="/static/icon-32x32.png" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+    <link rel="apple-touch-icon" sizes="76x76" href="/static/icon-76x76.png" />
+    <link rel="apple-touch-icon" sizes="120x120" href="/static/icon-120x120.png" />
+    <link rel="apple-touch-icon" sizes="152x152" href="/static/icon-152x152.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/icon-180x180.png" />
     <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
     <script src="/static/geoPosition.js" type="text/javascript" charset="utf-8"></script>
     <script src="/static/modernizr.js" type="text/javascript"></script>
