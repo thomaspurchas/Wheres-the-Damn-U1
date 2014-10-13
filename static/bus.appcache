@@ -1,6 +1,6 @@
 CACHE MANIFEST
 # Date: 13/10/2014
-# Version: 1.7
+# Version: 1.8
 
 CACHE:
 /static/bus-marker.png
@@ -22,13 +22,13 @@ CACHE:
 /static/icon-144x144.png
 /static/icon-120x120.png
 
-//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js
-//cdnjs.cloudflare.com/ajax/libs/moment.js/2.5.1/moment-with-langs.js
-//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css
-//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css
-//netdna.bootstrapcdn.com/font-awesome/4.0.3/fonts/fontawesome-webfont.woff?v=4.0.3
-//netdna.bootstrapcdn.com/font-awesome/4.0.3/fonts/fontawesome-webfont.ttf?v=4.0.3
-//netdna.bootstrapcdn.com/font-awesome/4.0.3/fonts/fontawesome-webfont.svg?v=4.0.3
+https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js
+https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.5.1/moment-with-langs.js
+https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css
+https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css
+https://netdna.bootstrapcdn.com/font-awesome/4.0.3/fonts/fontawesome-webfont.woff?v=4.0.3
+https://netdna.bootstrapcdn.com/font-awesome/4.0.3/fonts/fontawesome-webfont.ttf?v=4.0.3
+https://netdna.bootstrapcdn.com/font-awesome/4.0.3/fonts/fontawesome-webfont.svg?v=4.0.3
 //maps.googleapis.com/maps/api/js?key=AIzaSyB8UbiD-uUDWxHJxR4fXgBbcBzgFFKUDCY&sensor=true&callback=initializeMap
 
 
