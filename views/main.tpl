@@ -301,7 +301,7 @@
             placeStopMarker();
 
             // Send some GA tracking stuff so I know the most popular bus stops
-            ga('set', 'dimension1', data.stop.name);
+            ga('set', 'dimension1', data.stop.id + ' - ' + data.stop.name);
             ga('send', 'timing', 'Location', 'Got Stop Location', moment().diff(update_moment,'milliseconds'))
 
             if (data.next_bus != null){
