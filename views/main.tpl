@@ -302,6 +302,7 @@
 
             // Send some GA tracking stuff so I know the most popular bus stops
             ga('set', 'dimension1', data.stop.name);
+            ga('send', 'timing', 'Location', 'Got Stop Location', moment().diff(update_moment,'milliseconds'))
 
             if (data.next_bus != null){
                 nextBus = moment(data.next_bus.time);
@@ -528,7 +529,7 @@
   m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
   })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-  ga('create', 'UA-9039747-5', 'u1.jerix.co.uk');
+  ga('create', 'UA-9039747-5', 'auto');
   ga('send', 'pageview');
 
 </script>
