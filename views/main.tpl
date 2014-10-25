@@ -91,6 +91,7 @@
     #bus, #busDest {
         font-weight: bold;
     }
+    .secondtime {display:none}
     </style>
 </head>
 <body>
@@ -108,7 +109,7 @@
 
 <p>and the next bus is <span id="bus">...</span><small class="grey" id="busTime"></small> going to <span id="busDest">...</span></p>
 
-<p>there is another bus <span id="altBus">...</span><small class="grey" id="altBusTime"></small> going to <span id="altBusDest">...</span></p>
+<p class="secondtime">there is another bus <span id="altBus">...</span><small class="grey" id="altBusTime"></small> going to <span id="altBusDest">...</span></p>
 
 <p>
     <div id="map-canvas"></div>
