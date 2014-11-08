@@ -107,6 +107,7 @@
         position: absolute;
         -webkit-filter: blur(3px);
         filter: blur(3px);
+        background-color: white !important;
     }
 
     .secondtime {display:none}
