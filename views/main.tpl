@@ -492,7 +492,8 @@
           zoom: 12,
           // streetViewControl: false
           disableDefaultUI: true,
-          draggable: false
+          draggable: false,
+          disableDoubleClickZoom: false
         };
         map = new google.maps.Map(document.getElementById("map-canvas"),
             mapOptions);
