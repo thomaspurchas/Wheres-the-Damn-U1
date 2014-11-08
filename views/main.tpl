@@ -488,12 +488,12 @@
           zoom: 12,
           // streetViewControl: false
           disableDefaultUI: true,
-          draggable: false,
-          styles: dayStyle
+          draggable: false
         };
         map = new google.maps.Map(document.getElementById("map-canvas"),
             mapOptions);
 
+        mapOptions["styles"] = dayStyle;
         backgroundMap = new google.maps.Map(document.getElementById("background-map"),
             mapOptions);
 
