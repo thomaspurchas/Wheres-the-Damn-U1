@@ -488,9 +488,13 @@
           zoom: 12,
           // streetViewControl: false
           disableDefaultUI: true,
-          draggable: false
+          draggable: false,
+          styles: dayStyle
         };
-        map = new google.maps.Map(document.getElementById("background-map"),
+        map = new google.maps.Map(document.getElementById("map-canvas"),
+            mapOptions);
+
+        backgroundMap = new google.maps.Map(document.getElementById("background-map"),
             mapOptions);
 
         if (userCoords) {
@@ -545,6 +549,8 @@
     } else {
         AppCacheReady();
     }
+
+    var dayStyle = [{"featureType":"all","elementType":"all","stylers":[{"visibility":"off"}]},{"featureType":"road","elementType":"all","stylers":[{"visibility":"on"},{"color":"#ffffff"}]},{"featureType":"road.arterial","elementType":"all","stylers":[{"visibility":"on"},{"color":"#fee379"}]},{"featureType":"road.highway","elementType":"all","stylers":[{"visibility":"on"},{"color":"#fee379"}]},{"featureType":"landscape","elementType":"all","stylers":[{"visibility":"on"},{"color":"#f3f4f4"}]},{"featureType":"water","elementType":"all","stylers":[{"visibility":"on"},{"color":"#7fc8ed"}]},{"featureType":"road","elementType":"labels","stylers":[{"visibility":"off"}]},{"featureType":"poi.park","elementType":"geometry.fill","stylers":[{"visibility":"on"},{"color":"#90f069"}]},{"featureType":"all","elementType":"labels","stylers":[{"visibility":"off"}]},{"featureType":"landscape.man_made","elementType":"geometry","stylers":[{"visibility":"on"},{"color":"#fa5800"}]}];
 </script>
 
 <script>
