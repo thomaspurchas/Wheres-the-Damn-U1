@@ -202,7 +202,7 @@
                     navigator.geolocation.clearWatch(watch);
                     watch = navigator.geolocation.watchPosition(success_callback,error_callback,{enableHighAccuracy:true});
                     watchTimeout = window.setTimeout(cancelGeoWatch, 15000);
-                    ipRequest = $.getJSON("http://ip-dir.herokuapp.com") // Use the ip db, it should return faster and with a better result
+                    ipRequest = $.getJSON("https://ip-dir.herokuapp.com") // Use the ip db, it should return faster and with a better result
                         .done(function(data) {
                             if (data.location) {
                                 success_callback({coords:data.location});
