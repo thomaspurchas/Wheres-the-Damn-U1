@@ -31,6 +31,7 @@
         max-width: 520px;
         min-height: 100%;
         margin: auto;
+        color: black;
     }
     @media (min-width: 520px) {
         body {
@@ -74,6 +75,11 @@
     .grey {
         color: #b9b9b9;
     }
+    .block {
+        background: rgba(255,255,255,0.8);
+        border-radius: 10px;
+        padding: 10px 10px 5px 10px;
+    }
     #updateError {
         display: none;
     }
@@ -87,6 +93,7 @@
         height: 200px;
         width: 100%;
         display: none;
+        border-radius: 10px;
     }
     #bus, #busDest {
         font-weight: bold;
@@ -122,13 +129,17 @@
     bus data :(
 </div>
 
-<p>Your location is: <span id="loc">...</span></p>
+<div class="block">
 
-<p>Your nearest <span class="routeNumber">U1</span> bus stop is: <span id="nearest">...</span></p>
+    <p>Your location is: <span id="loc">...</span></p>
 
-<p>and the next bus is <span id="bus">...</span><small class="grey" id="busTime"></small> going to <span id="busDest">...</span></p>
+    <p>Your nearest <span class="routeNumber">U1</span> bus stop is: <span id="nearest">...</span></p>
 
-<p class="secondtime">there is another bus <span id="altBus">...</span><small class="grey" id="altBusTime"></small> going to <span id="altBusDest">...</span></p>
+    <p>and the next bus is <span id="bus">...</span><small class="grey" id="busTime"></small> going to <span id="busDest">...</span></p>
+
+    <p class="secondtime">there is another bus <span id="altBus">...</span><small class="grey" id="altBusTime"></small> going to <span id="altBusDest">...</span></p>
+
+</div>
 
 <p>
     <div id="map-canvas"></div>
