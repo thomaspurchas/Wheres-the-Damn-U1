@@ -177,6 +177,7 @@
     var busMarker = null;
     var accuracyCircle = null;
     var map = null;
+    var backgroundMap = null;
     var userCoords = null;
     var stopCoords = null;
 
@@ -431,6 +432,8 @@
             var bounds = new google.maps.LatLngBounds(googBusLatLon);
             bounds = bounds.extend(googUserLatLon);
             map.fitBounds(bounds);
+            backgroundMap.fitBounds(bounds);
+            if (backgroundMap.getZoom() > 16) backgroundMap.setZoom(16);
         }
     }
 
