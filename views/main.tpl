@@ -76,10 +76,6 @@
         margin-bottom: 10px;
         text-align: center;
     }
-    .map-wrapper {
-        overflow: hidden;
-        border-radius: 10px;
-    }
     p.update {
         margin-bottom: 0px;
     }
@@ -103,6 +99,7 @@
         width: 100%;
         display: none;
         border-radius: 10px;
+        margin-bottom: 10px;
     }
     #bus, #busDest {
         font-weight: bold;
@@ -165,10 +162,7 @@
     <p class="secondtime">there is another bus <span id="altBus">...</span><small class="grey" id="altBusTime"></small> going to <span id="altBusDest">...</span></p>
 </div>
 
-
-    <div class="map-wrapper">
-        <div id="map-canvas"></div>
-    </div>
+<div id="map-canvas"></div>
 
 
 <div class="alert alert-danger" id="updateError">
