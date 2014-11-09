@@ -76,6 +76,9 @@
         margin-bottom: 10px;
         text-align: center;
     }
+    p.update {
+        margin-bottom: 0px;
+    }
     #logo {
         display: block;
         width: 100%;
@@ -92,7 +95,7 @@
         display: none;
     }
     #map-canvas {
-        height: 200px;
+        height: 183px;
         width: 100%;
         display: none;
         border-radius: 10px;
@@ -136,6 +139,10 @@
     </style>
 </head>
 <body>
+<div id="background">
+    <div id="background-map">
+    </div>
+</div>
 <object type="image/svg+xml" data="/static/U1_day_logo.svg" id="logo"></object>
 
 <div class="alert alert-danger" id="offlineError">
@@ -176,11 +183,6 @@
     </button>
     <small class="grey">Last Update:<br/><span id="lastUpdate">Never</span></small>
 </p>
-
-<div id="background">
-    <div id="background-map">
-    </div>
-</div>
 
 <script type="text/javascript">
     var nearestElmt = document.getElementById("nearest");
