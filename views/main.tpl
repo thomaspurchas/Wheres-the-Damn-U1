@@ -80,6 +80,12 @@
         border-radius: 10px;
         padding: 10px 10px 5px 10px;
     }
+    #logo {
+        display: block;
+        width: 100%;
+        margin: 0 auto;
+        max-width: 200px;
+    }
     #updateError {
         display: none;
     }
@@ -124,7 +130,7 @@
     </style>
 </head>
 <body>
-<h1>Where the hell's the <span class="routeNumber">U1</span>?</h1>
+<object type="image/svg+xml" data="/static/U1_day_logo.svg" id="logo"></object>
 
 <div class="alert alert-danger" id="offlineError">
     <strong>Offline!</strong>
@@ -353,6 +359,7 @@
                 }
                 updateTimers();
                 $('.routeNumber').text(data.next_bus.route_number);
+                $("#logo")[0].contentDocument.getElementById('route').textContent=data.next_bus.route_number;
             }else{
                 busElmt.innerHTML = "Sorry, that data is not avaliable at the moment :(";
             }
