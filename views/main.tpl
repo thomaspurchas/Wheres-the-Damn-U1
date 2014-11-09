@@ -73,11 +73,12 @@
         background: rgba(255,255,255,0.8);
         border-radius: 10px;
         padding: 10px 10px 5px 10px;
+        margin-bottom: 10px;
     }
     #logo {
         display: block;
         width: 100%;
-        margin: 0 auto;
+        margin: 15px auto 20px auto;
         max-width: 125px;
     }
     #updateError {
