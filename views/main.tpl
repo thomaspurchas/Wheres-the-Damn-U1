@@ -143,15 +143,13 @@
 </div>
 
 <div class="block">
+    <p>Your nearest stop is: <span id="nearest"></span></p>
+</div>
 
-    <p>Your location is: <span id="loc">...</span></p>
-
-    <p>Your nearest <span class="routeNumber">U1</span> bus stop is: <span id="nearest">...</span></p>
-
+<div class="block">
     <p>and the next bus is <span id="bus">...</span><small class="grey" id="busTime"></small> going to <span id="busDest">...</span></p>
 
     <p class="secondtime">there is another bus <span id="altBus">...</span><small class="grey" id="altBusTime"></small> going to <span id="altBusDest">...</span></p>
-
 </div>
 
 <p>
@@ -183,7 +181,6 @@
 </div>
 
 <script type="text/javascript">
-    var locElmt = document.getElementById("loc");
     var nearestElmt = document.getElementById("nearest");
     var busElmt = document.getElementById("bus");
     var updateButton = $('#updateButton');
@@ -252,7 +249,7 @@
             $('#updateButton').click();
         } else {
                 // You cannot use Geolocation in this device
-            locElmt.innerHTML = "Damn, can't get your location. Sorry :(";
+            // locElmt.innerHTML = "Damn, can't get your location. Sorry :(";
         }
 
         if (Modernizr.localstorage) {
@@ -279,14 +276,14 @@
 
         coords = p.coords;
         if (coords.name) {
-            locElmt.innerHTML = coords.name +
-                "<br/>Location Accuracy is " +
-                Math.round(coords.accuracy) + "m";
+            // locElmt.innerHTML = coords.name +
+            //     "<br/>Location Accuracy is " +
+            //     Math.round(coords.accuracy) + "m";
         } else {
-            locElmt.innerHTML = Math.round(coords.latitude*10000)/10000 + ", " +
-                Math.round(coords.longitude*10000)/10000 +
-                "<br/>Location Accuracy is " +
-                Math.round(coords.accuracy) + "m";
+            // locElmt.innerHTML = Math.round(coords.latitude*10000)/10000 + ", " +
+            //     Math.round(coords.longitude*10000)/10000 +
+            //     "<br/>Location Accuracy is " +
+            //     Math.round(coords.accuracy) + "m";
         }
 
 
@@ -314,7 +311,7 @@
 
     function error_callback(p){
         // p.message : error message
-        locElmt.innerHTML = "Damn, can't get your location. Sorry :(";
+        // locElmt.innerHTML = "Damn, can't get your location. Sorry :(";
         updateButton.prop('disabled', false);
         updateButton.find('.fa-compass').removeClass('fa-spin');
         updateButton.contents().last()[0].textContent=' Update Bus Info';
@@ -340,8 +337,8 @@
                 localStorage.setItem("lastUpdate", lastUpdate);
             }
 
-            nearestElmt.innerHTML = data.stop.name + ", ~" +
-                Math.round(data.stop.distance) + "m away";
+            nearestElmt.innerHTML = data.stop.name + " <small class='grey'>(" +
+                Math.round(data.stop.distance) + "m)</small>";
 
             if (Modernizr.localstorage) {
                 localStorage.setItem("busStop", nearestElmt.innerHTML);
