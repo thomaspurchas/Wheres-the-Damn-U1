@@ -74,6 +74,7 @@
         border-radius: 10px;
         padding: 10px 10px 5px 10px;
         margin-bottom: 10px;
+        text-align: center;
     }
     #logo {
         display: block;
@@ -148,7 +149,7 @@
 </div>
 
 <div class="block">
-    <p>and the next bus is <span id="bus">...</span><small class="grey" id="busTime"></small> going to <span id="busDest">...</span></p>
+    <p>The next bus is <span id="bus">...</span><small class="grey" id="busTime"></small></br>going to <span id="busDest">...</span></p>
 
     <p class="secondtime">there is another bus <span id="altBus">...</span><small class="grey" id="altBusTime"></small> going to <span id="altBusDest">...</span></p>
 </div>
