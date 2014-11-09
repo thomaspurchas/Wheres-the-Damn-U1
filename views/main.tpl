@@ -1,6 +1,6 @@
 <!DOCTYPE HTML>
-<html manifest="/static/bus.appcache">
-<!-- <html> -->
+<!-- <html manifest="/static/bus.appcache"> -->
+<html>
 <head>
     <title>WTHTU1 - Where the Hell's the U1?</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
@@ -75,6 +75,10 @@
         padding: 10px 10px 5px 10px;
         margin-bottom: 10px;
         text-align: center;
+    }
+    .map-wrapper {
+        overflow: hidden;
+        border-radius: 10px;
     }
     p.update {
         margin-bottom: 0px;
@@ -161,9 +165,11 @@
     <p class="secondtime">there is another bus <span id="altBus">...</span><small class="grey" id="altBusTime"></small> going to <span id="altBusDest">...</span></p>
 </div>
 
-<p>
-    <div id="map-canvas"></div>
-</p>
+
+    <div class="map-wrapper">
+        <div id="map-canvas"></div>
+    </div>
+
 
 <div class="alert alert-danger" id="updateError">
 <strong>Oh snap!</strong> We couldn't get the latest bus data :(
