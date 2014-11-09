@@ -74,6 +74,7 @@
         border-radius: 10px;
         padding: 10px 10px 5px 10px;
         margin-bottom: 10px;
+        text-align: center;
     }
     #logo {
         display: block;
