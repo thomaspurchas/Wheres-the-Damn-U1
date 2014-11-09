@@ -112,8 +112,11 @@
         width: 110%;
         margin: -5%;
         position: absolute;
-        -webkit-filter: blur(3px);
         filter: blur(3px);
+        -webkit-filter: blur(3px);
+        -moz-filter: blur(3px);
+        -o-filter: blur(3px);
+        -ms-filter: blur(3px);
         background-color: white !important;
     }
 
