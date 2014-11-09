@@ -33,12 +33,6 @@
         margin: auto;
         color: black;
     }
-    @media (min-width: 520px) {
-        body {
-            box-shadow: 0 0 20px 1px #505050;
-            max-width: 510px;
-        }
-    }
     body:after {
         content: '';
         z-index: -99;
@@ -84,7 +78,7 @@
         display: block;
         width: 100%;
         margin: 0 auto;
-        max-width: 200px;
+        max-width: 125px;
     }
     #updateError {
         display: none;
@@ -124,6 +118,16 @@
         -o-filter: blur(3px);
         -ms-filter: blur(3px);
         background-color: white !important;
+    }
+
+    @media (min-width: 520px) {
+        body {
+            box-shadow: 0 0 20px 1px #505050;
+            max-width: 510px;
+        }
+        #logo {
+            max-width: 200px;
+        }
     }
 
     .secondtime {display:none}
