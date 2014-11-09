@@ -1,6 +1,5 @@
 <!DOCTYPE HTML>
-<html manifest="/static/bus.appcache">
-<!-- <html> -->
+{{!"<html manifest='/static/bus.appcache'>" if APPCACHE else "<html>"}}
 <head>
     <title>WTHTU1 - Where the Hell's the U1?</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
@@ -99,6 +98,7 @@
         width: 100%;
         display: none;
         border-radius: 10px;
+        margin-bottom: 10px;
     }
     #bus, #busDest {
         font-weight: bold;
@@ -161,9 +161,8 @@
     <p class="secondtime">there is another bus <span id="altBus">...</span><small class="grey" id="altBusTime"></small> going to <span id="altBusDest">...</span></p>
 </div>
 
-<p>
-    <div id="map-canvas"></div>
-</p>
+<div id="map-canvas"></div>
+
 
 <div class="alert alert-danger" id="updateError">
 <strong>Oh snap!</strong> We couldn't get the latest bus data :(
@@ -590,8 +589,18 @@
         AppCacheReady();
     }
 
-    var dayBackgroundStyle = [{"featureType":"all","elementType":"all","stylers":[{"visibility":"off"}]},{"featureType":"road","elementType":"all","stylers":[{"visibility":"on"},{"color":"#ffffff"}]},{"featureType":"road.arterial","elementType":"all","stylers":[{"visibility":"on"},{"color":"#fee379"}]},{"featureType":"road.highway","elementType":"all","stylers":[{"visibility":"on"},{"color":"#fee379"}]},{"featureType":"landscape","elementType":"all","stylers":[{"visibility":"on"},{"color":"#f3f4f4"}]},{"featureType":"water","elementType":"all","stylers":[{"visibility":"on"},{"color":"#7fc8ed"}]},{"featureType":"road","elementType":"labels","stylers":[{"visibility":"off"}]},{"featureType":"poi.park","elementType":"geometry.fill","stylers":[{"visibility":"on"},{"color":"#90f069"}]},{"featureType":"all","elementType":"labels","stylers":[{"visibility":"off"}]},{"featureType":"landscape.man_made","elementType":"geometry","stylers":[{"visibility":"off"},{"color":"#fa5800"}]},{"featureType":"road","elementType":"geometry.stroke","stylers":[{"color":"#000000"},{"hue":"#ff8400"},{"saturation":50},{"lightness":69}]}];
-    var dayStyle = [{"featureType":"all","elementType":"all","stylers":[{"visibility":"off"}]},{"featureType":"road","elementType":"all","stylers":[{"visibility":"on"},{"color":"#ffffff"}]},{"featureType":"road.arterial","elementType":"all","stylers":[{"visibility":"on"},{"color":"#fee379"}]},{"featureType":"road.highway","elementType":"all","stylers":[{"visibility":"on"},{"color":"#fee379"}]},{"featureType":"landscape","elementType":"all","stylers":[{"visibility":"on"},{"color":"#f3f4f4"}]},{"featureType":"water","elementType":"all","stylers":[{"visibility":"on"},{"color":"#7fc8ed"}]},{"featureType":"road","elementType":"labels","stylers":[{"visibility":"off"}]},{"featureType":"poi.park","elementType":"geometry.fill","stylers":[{"visibility":"on"},{"color":"#90f069"}]},{"featureType":"all","elementType":"labels","stylers":[{"visibility":"off"}]},{"featureType":"landscape.man_made","elementType":"geometry","stylers":[{"visibility":"off"},{"color":"#fa5800"}]},{"featureType":"road","elementType":"geometry.stroke","stylers":[{"color":"#000000"},{"hue":"#ff8400"},{"saturation":50},{"lightness":69}]},{"featureType":"road","elementType":"labels.text.stroke","stylers":[{"visibility":"on"},{"color":"#000000"}]}];
+    var dayStyle = [{"featureType":"all","elementType":"all","stylers":[{"visibility":"on"}]},{"featureType":"all","elementType":"all","stylers":[{"visibility":"on"}]},{"featureType":"road","elementType":"all","stylers":[{"visibility":"on"},{"color":"#ffffff"}]},{"featureType":"road.arterial","elementType":"all","stylers":[{"visibility":"on"},{"color":"#fee379"}]},{"featureType":"road.highway","elementType":"all","stylers":[{"visibility":"on"},{"color":"#fee379"}]},{"featureType":"landscape.man_made","elementType":"geometry.stroke","stylers":[{"visibility":"on"},{"invert_lightness":false},{"color":"#f3f4f4"},{"weight":0.28},{"lightness":-46}]},{"featureType":"landscape.man_made","elementType":"geometry.fill","stylers":[{"visibility":"on"},{"color":"#f3f4f4"}]},{"featureType":"landscape.natural","elementType":"all","stylers":[{"visibility":"on"},{"color":"#f3f4f4"}]},{"featureType":"water","elementType":"all","stylers":[{"visibility":"on"},{"color":"#7fc8ed"}]},{"featureType":"road","elementType":"labels","stylers":[{"visibility":"off"}]},{"featureType":"poi.park","elementType":"geometry.fill","stylers":[{"visibility":"on"},{"color":"#90f069"}]},{"featureType":"all","elementType":"labels","stylers":[{"visibility":"off"}]},{"featureType":"road","elementType":"geometry.stroke","stylers":[{"color":"#f3f4f4"},{"lightness":-25}]},{"featureType":"road","elementType":"labels.text.stroke","stylers":[{"visibility":"on"},{"color":"#000000"}]},{"featureType":"poi","elementType":"all","stylers":[{"visibility":"off"}]},{"featureType":"poi.school","elementType":"geometry.fill","stylers":[{"visibility":"on"},{"color":"#f3f4f4"},{"lightness":-3}]}];
+
+    var dayBackgroundStyle = dayStyle.slice();
+    // Turn off road labels
+    dayBackgroundStyle.push({
+        "featureType":"road",
+        "elementType":"labels.text.stroke",
+        "stylers":[
+            {
+            "visibility":"off"
+            }
+        ]});
 </script>
 
 <script>
