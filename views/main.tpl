@@ -499,7 +499,7 @@
         var mapOptions = {
           center: new google.maps.LatLng(52.287373, -1.548609),
           zoom: 12,
-          // streetViewControl: false
+          streetViewControl: false,
           disableDefaultUI: true,
           draggable: false,
           disableDoubleClickZoom: false
