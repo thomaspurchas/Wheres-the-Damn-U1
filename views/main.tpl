@@ -148,7 +148,7 @@
 </div>
 
 <div class="block">
-    <p>and the next bus is <span id="bus">...</span><small class="grey" id="busTime"></small> going to <span id="busDest">...</span></p>
+    <p>The next bus is <span id="bus">...</span><small class="grey" id="busTime"></small> going to <span id="busDest">...</span></p>
 
     <p class="secondtime">there is another bus <span id="altBus">...</span><small class="grey" id="altBusTime"></small> going to <span id="altBusDest">...</span></p>
 </div>
