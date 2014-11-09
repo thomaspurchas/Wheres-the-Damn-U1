@@ -1,6 +1,5 @@
 <!DOCTYPE HTML>
-<!-- <html manifest="/static/bus.appcache"> -->
-<html>
+{{!"<html manifest='/static/bus.appcache'>" if APPCACHE else "<html>"}}
 <head>
     <title>WTHTU1 - Where the Hell's the U1?</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">

@@ -25,6 +25,7 @@ HEROKU = True if os.environ.get("DATABASE_URL", None) else False
 DEBUG = not HEROKU
 DATABASE_URL = os.environ.get("DATABASE_URL", 'postgresql://kjntea_omsysv:35deb151@spacialdb.com:9999/kjntea_omsysv')
 MEMCACHEDCLOUD_SERVERS = os.environ.get('MEMCACHEDCLOUD_SERVERS', 'localhost:11211').split(',')
+APPCACHE = os.environ.get('APPCACHE', 'FALSE').upper() == 'TRUE'
 
 Base = declarative_base()
 engine = create_engine(DATABASE_URL, echo=DEBUG, pool_recycle=3600)
@@ -447,7 +448,7 @@ def deleteallstops(db):
 
 @route('/')
 def show_home():
-    return template('main')
+    return template('main',APPCACHE=APPCACHE)
 
 @route('/static/<path:path>')
 def callback(path):
