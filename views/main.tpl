@@ -443,8 +443,6 @@
             var bounds = new google.maps.LatLngBounds(googBusLatLon);
             bounds = bounds.extend(googUserLatLon);
             map.fitBounds(bounds);
-            backgroundMap.fitBounds(bounds);
-            if (backgroundMap.getZoom() > 16) backgroundMap.setZoom(16);
         }
     }
 
@@ -512,6 +510,16 @@
         mapOptions["styles"] = dayStyle;
         backgroundMap = new google.maps.Map(document.getElementById("background-map"),
             mapOptions);
+
+        google.maps.event.addListener(map, 'center_changed', function() {
+            // Set backgroundMap to match actual map
+            backgroundMap.panTo(map.getCenter());
+        });
+
+        google.maps.event.addListener(map, 'zoom_changed', function() {
+            // Set backgroundMap zoom to be further out than actual map
+            backgroundMap.setZoom((map.getZoom()-2 >= 1) ? map.getZoom()-2 : 1);
+        });
 
         if (userCoords) {
             placeUserMarker();
