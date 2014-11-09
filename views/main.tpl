@@ -118,7 +118,7 @@
         -moz-filter: blur(3px);
         -o-filter: blur(3px);
         -ms-filter: blur(3px);
-        background-color: white !important;
+        background-color: #F4F5F5!important;
     }
 
     @media (min-width: 520px) {
