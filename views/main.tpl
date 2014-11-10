@@ -516,7 +516,7 @@
           streetViewControl: false,
           disableDefaultUI: true,
           draggable: false,
-          disableDoubleClickZoom: false
+          disableDoubleClickZoom: true
         };
         mapOptions["styles"] = dayStyle;
         map = new google.maps.Map(document.getElementById("map-canvas"),
