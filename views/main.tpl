@@ -197,9 +197,6 @@
     var watch = null;
     var watchTimeout = null;
     var ipRequest = null;
-    var userMarker = null;
-    var busMarker = null;
-    var accuracyCircle = null;
     var map = null;
     var backgroundMap = null;
     var userCoords = null;
@@ -306,7 +303,8 @@
         }
 
         userCoords = coords;
-        placeUserMarker();
+        placeUserMarker(map);
+        // placeUserMarker(backgroundMap);
 
         getBusData(coords);
 
@@ -348,7 +346,7 @@
             }
 
             stopCoords = data.stop.location;
-            placeStopMarker();
+            placeStopMarker(map);
 
             // Send some GA tracking stuff so I know the most popular bus stops
             ga('set', 'dimension1', data.stop.id + ' - ' + data.stop.name);
@@ -395,15 +393,15 @@
           });
     }
 
-    function placeUserMarker() {
+    function placeUserMarker(map) {
         if (map) {
             var coords = userCoords;
 
-            if (userMarker) { userMarker.setMap(null) }
+            if (map.get('userMarker')) { map.get('userMarker').setMap(null) }
 
             var googUserLatLon = new google.maps.LatLng(coords.latitude, coords.longitude);
 
-            userMarker = new google.maps.Marker({
+            var userMarker = new google.maps.Marker({
                 position: googUserLatLon,
                 icon: {
                     url: '/static/user-marker.png',
@@ -414,8 +412,9 @@
             });
 
             userMarker.setMap(map);
+            map.set('userMarker', userMarker)
 
-            if (accuracyCircle) { accuracyCircle.setMap(null) }
+            if (map.get('accuracyCircle')) { map.get('accuracyCircle').setMap(null) }
 
             var accuracyCircleOptions = {
                 strokeColor: '#5191E7',
@@ -429,10 +428,11 @@
 
             accuracyCircle = new google.maps.Circle(accuracyCircleOptions);
             accuracyCircle.setMap(map);
+            map.set('accuracyCircle', accuracyCircle);
         }
     }
 
-    function placeStopMarker() {
+    function placeStopMarker(map) {
         if (map) {
 
             var coords = stopCoords;
@@ -440,9 +440,9 @@
             var googBusLatLon = new google.maps.LatLng(coords.lat, coords.lon);
             var googUserLatLon = new google.maps.LatLng(userCoords.latitude, userCoords.longitude);
 
-            if (busMarker) {busMarker.setMap(null)}
+            if (map.get('busMarker')) {map.get('busMarker').setMap(null)}
 
-            busMarker = new google.maps.Marker({
+            var busMarker = new google.maps.Marker({
                 position: googBusLatLon,
                 icon: {
                     url: '/static/bus-marker.png',
@@ -453,6 +453,7 @@
             });
 
             busMarker.setMap(map);
+            map.set('busMarker', busMarker);
 
             var bounds = new google.maps.LatLngBounds(googBusLatLon);
             bounds = bounds.extend(googUserLatLon);
@@ -509,6 +510,34 @@
         updateTimeout = window.setTimeout(updateTimers, Math.min(updateInterval, timeTillMin));
     }
 
+    function offsetMapCenter(map,latlng,offsetx,offsety) {
+
+        // latlng is the apparent centre-point
+        // offsetx is the distance you want that point to move to the right, in pixels
+        // offsety is the distance you want that point to move upwards, in pixels
+        // offset can be negative
+        // offsetx and offsety are both optional
+
+        var scale = Math.pow(2, map.getZoom());
+        var nw = new google.maps.LatLng(
+            map.getBounds().getNorthEast().lat(),
+            map.getBounds().getSouthWest().lng()
+        );
+
+        var worldCoordinateCenter = map.getProjection().fromLatLngToPoint(latlng);
+        var pixelOffset = new google.maps.Point((offsetx/scale) || 0,(offsety/scale) ||0)
+
+        var worldCoordinateNewCenter = new google.maps.Point(
+            worldCoordinateCenter.x - pixelOffset.x,
+            worldCoordinateCenter.y + pixelOffset.y
+        );
+
+        var newCenter = map.getProjection().fromPointToLatLng(worldCoordinateNewCenter);
+
+        map.panTo(newCenter);
+
+    }
+
     function initializeMap() {
         var mapOptions = {
           center: new google.maps.LatLng(52.287373, -1.548609),
@@ -516,7 +545,7 @@
           streetViewControl: false,
           disableDefaultUI: true,
           draggable: false,
-          disableDoubleClickZoom: false
+          disableDoubleClickZoom: true
         };
         mapOptions["styles"] = dayStyle;
         map = new google.maps.Map(document.getElementById("map-canvas"),
@@ -528,19 +557,28 @@
 
         google.maps.event.addListener(map, 'center_changed', function() {
             // Set backgroundMap to match actual map
-            backgroundMap.panTo(map.getCenter());
+            offsetMapCenter(backgroundMap, map.getCenter(), 0, 180);
         });
 
         google.maps.event.addListener(map, 'zoom_changed', function() {
             // Set backgroundMap zoom to be further out than actual map
-            backgroundMap.setZoom((map.getZoom()-2 >= 1) ? map.getZoom()-2 : 1);
+            var zoom = map.getZoom() - 1;
+            if (zoom > 17) {
+                zoom = 17;
+            } else if (zoom < 1) {
+                zoom = 1;
+            }
+
+            backgroundMap.setZoom(zoom);
+            offsetMapCenter(backgroundMap, map.getCenter(), 0, 180);
         });
 
         if (userCoords) {
-            placeUserMarker();
+            placeUserMarker(map);
+            // placeUserMarker(backgroundMap);
         }
         if (stopCoords) {
-            placeStopMarker();
+            placeStopMarker(map);
         }
 
         $('#map-canvas').show();
@@ -603,7 +641,7 @@
         ]});
 </script>
 
-<script>
+<script type="text/javascript">
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
   m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
@@ -616,4 +654,3 @@
 
 </body>
 </html>
-<html>
