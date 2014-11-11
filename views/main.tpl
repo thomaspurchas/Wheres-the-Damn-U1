@@ -510,6 +510,34 @@
         updateTimeout = window.setTimeout(updateTimers, Math.min(updateInterval, timeTillMin));
     }
 
+    function offsetMapCenter(map,latlng,offsetx,offsety) {
+
+        // latlng is the apparent centre-point
+        // offsetx is the distance you want that point to move to the right, in pixels
+        // offsety is the distance you want that point to move upwards, in pixels
+        // offset can be negative
+        // offsetx and offsety are both optional
+
+        var scale = Math.pow(2, map.getZoom());
+        var nw = new google.maps.LatLng(
+            map.getBounds().getNorthEast().lat(),
+            map.getBounds().getSouthWest().lng()
+        );
+
+        var worldCoordinateCenter = map.getProjection().fromLatLngToPoint(latlng);
+        var pixelOffset = new google.maps.Point((offsetx/scale) || 0,(offsety/scale) ||0)
+
+        var worldCoordinateNewCenter = new google.maps.Point(
+            worldCoordinateCenter.x - pixelOffset.x,
+            worldCoordinateCenter.y + pixelOffset.y
+        );
+
+        var newCenter = map.getProjection().fromPointToLatLng(worldCoordinateNewCenter);
+
+        map.panTo(newCenter);
+
+    }
+
     function initializeMap() {
         var mapOptions = {
           center: new google.maps.LatLng(52.287373, -1.548609),
@@ -529,12 +557,20 @@
 
         google.maps.event.addListener(map, 'center_changed', function() {
             // Set backgroundMap to match actual map
-            backgroundMap.panTo(map.getCenter());
+            offsetMapCenter(backgroundMap, map.getCenter(), 0, 180);
         });
 
         google.maps.event.addListener(map, 'zoom_changed', function() {
             // Set backgroundMap zoom to be further out than actual map
-            backgroundMap.setZoom((map.getZoom()-2 >= 1) ? map.getZoom()-2 : 1);
+            var zoom = map.getZoom() - 1;
+            if (zoom > 17) {
+                zoom = 17;
+            } else if (zoom < 1) {
+                zoom = 1;
+            }
+
+            backgroundMap.setZoom(zoom);
+            offsetMapCenter(backgroundMap, map.getCenter(), 0, 180);
         });
 
         if (userCoords) {
