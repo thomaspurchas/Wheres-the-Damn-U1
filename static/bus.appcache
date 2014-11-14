@@ -9,18 +9,8 @@ CACHE:
 /static/modernizr.js
 /static/android-manifest.json
 /apple-touch-icon.png
-/static/icon-32x32.png
-/static/apple-touch-icon.png
-/static/icon-96x96.png
-/static/icon-76x76.png
-/static/icon-72x72.png
-/static/icon-48x48.png
-/static/icon-36x36.png
 /static/icon-192x192.png
 /static/icon-180x180.png
-/static/icon-152x152.png
-/static/icon-144x144.png
-/static/icon-120x120.png
 /static/U1_day_logo.svg
 
 https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js
