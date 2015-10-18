@@ -85,7 +85,7 @@
         width: 100%;
         margin: 15px auto 20px auto;
         max-width: 125px;
-        font-family: "jaf-domus-titling-web",sans-serif;
+        font-family: "DomusTitling","jaf-domus-titling-web",sans-serif;
     }
     #updateError {
         display: none;
@@ -364,7 +364,7 @@
                 }
                 updateTimers();
                 $('.routeNumber').text(data.next_bus.route_number);
-                $("#logo")[0].contentDocument.getElementById('route').textContent=data.next_bus.route_number;
+                $("#logo #route").text(data.next_bus.route_number);
             }else{
                 busElmt.innerHTML = "Sorry, that data is not avaliable at the moment :(";
             }
