@@ -17,6 +17,8 @@
     <script src="/static/geoPosition.js" type="text/javascript" charset="utf-8"></script>
     <script src="/static/modernizr.js" type="text/javascript"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.5.1/moment-with-langs.js"></script>
+    <script src="https://use.typekit.net/xuz8lmw.js"></script>
+    <script>try{Typekit.load({ async: true });}catch(e){}</script> 
 
     <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
     <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
@@ -83,6 +85,7 @@
         width: 100%;
         margin: 15px auto 20px auto;
         max-width: 125px;
+        font-family: "jaf-domus-titling-web",sans-serif;
     }
     #updateError {
         display: none;
@@ -143,7 +146,7 @@
     <div id="background-map">
     </div>
 </div>
-<object type="image/svg+xml" data="/static/U1_day_logo.svg" id="logo"></object>
+% include('U1_day_logo.svg')
 
 <div class="alert alert-danger" id="offlineError">
     <strong>Offline!</strong>
