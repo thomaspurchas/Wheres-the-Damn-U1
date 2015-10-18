@@ -355,7 +355,7 @@ def get_next_bus(mc, db, stop_id):
         if bus:
             bus = {'departure': bus[0].to_JSON(), 'days_future': int(bus[1])}
 
-        mc.set(mc_key, bus, 6*60*60)
+        mc.set(mc_key, bus, 30*24*60*60)
 
     if bus:
         departure = bus['departure']
