@@ -325,7 +325,7 @@ def get_next_bus(mc, db, stop_id):
     now_day = now_datetime.weekday()
     now_time = now_datetime.time()
 
-    mc_key = "V6:USERSTOP:" +  str(stop_id) + "USERTIME:" + now_time.strftime("%w%H%M")
+    mc_key = "V6:USERSTOP:" +  str(stop_id) + "USERTIME:" + now_datetime.strftime("%w%H%M")
 
     bus = mc.get(mc_key)
     if not bus:
