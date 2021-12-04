@@ -1,9 +1,9 @@
 GeoAlchemy2==0.2.3
-SQLAlchemy==0.9.3
-bottle==0.12.5
+SQLAlchemy==1.2.18
+bottle==0.12.19
 bottle-sqlalchemy==0.4.1
-gevent==1.0.2
-gunicorn==18.0
+gevent==1.2a1
+gunicorn==19.10.0
 newrelic==2.18.1.15
 psycopg2==2.5.2
 py2-ipaddress==2.0
